@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Pipeline: raw downloads are never committed
+pipeline/raw/
+
+# Generated data is built in CI
+public/data/
+
+# Node
+node_modules/
