@@ -59,10 +59,10 @@ Criteria (MVP):
 | key | label (FR UI) | unit | better | default weight |
 |---|---|---|---|---|
 | `pop` | Population | inhabitants | — (filter only) | — |
-| `per_bakery` | Habitants par boulangerie | inhabitants | higher | High (3) |
+| `per_bakery` | Habitants par boulangerie (la vôtre comprise) | inhabitants | higher | High (3) |
 | `income` | Revenu médian | €/year/UC | higher | Medium (2) |
 | `growth` | Évolution de la population | %/year | higher | Medium (2) |
-| `crime` | Taux de délinquance | offences /1,000 | lower | Low (1) |
+| `crime` | Taux de délinquance | offences /1,000 | lower | Low (1), on by default |
 | `sell_soon` | Boulangeries à reprendre bientôt | count | higher | Low (1) — High in takeover preset |
 
 ### 3.3 Delivery mode (switch "Boulangerie mobile ou livraison")
@@ -88,8 +88,22 @@ Income & housing (median vs département vs France, poverty rate, second homes, 
 Safety & services (crime vs département vs France, schools, pharmacy, doctors, post office, station; market day "not in open data yet") ·
 Next steps (Pro teasers: bank study, bakeries for sale; opt-in "put me in touch with a broker") · Sources footer.
 
-Pre-render commune pages as static HTML at build time if possible: they are valuable for SEO
-("boulangerie à reprendre {commune}").
+Pre-render commune pages as static HTML at build time: they are valuable for SEO
+("boulangerie à reprendre {commune}"). GitHub Pages has no URL rewriting, so `/commune/{code}/index.html`
+must exist as a file. One build command generates all ~35k pages (≈ 10 kB each, ≈ 350 MB, under the
+1 GB Pages limit); it runs the same way locally and in the GitHub Action. The pages are deployed as the
+Pages artifact and **never committed** to git (a monthly refresh would otherwise add ~35k files to history).
+
+### 3.5 Sources & method page (route `/sources/`)
+One page, linked from the sidebar, every card and the commune page footer. In French, plain language.
+- **Sources:** for each dataset, name, producer, vintage, licence, link, what we use it for (from `meta.json`).
+- **Choices:** every scoring rule and why — national percentiles, weights, the no-bakery rule, the bakery count
+  source (BPE), the growth definition, the crime indicators, the "likely to sell" signal and its privacy rule.
+- **Potential biases and limits:** statistical secrecy on small communes (missing ≠ 0, criterion dropped),
+  BPE vs SIRENE gaps, supermarket in-store bakeries not counted as bakeries, crime recorded where reported
+  (tourist and commuter communes look worse), census lag (population is 3 years old), commune mergers,
+  seasonal population not captured, Paris/Lyon/Marseille kept whole.
+Kept up to date with every milestone that adds or changes a criterion.
 
 ## 4. Scoring (decided)
 
@@ -97,7 +111,14 @@ Pre-render commune pages as static HTML at build time if possible: they are valu
   communes** in the pipeline (`0..1`, ties = mid-rank). Invert for "lower is better" criteria.
 - Client computes `score = round(100 × Σ(wᵢ × pᵢ) / Σ(wᵢ))` over criteria with weight > 0 **and a value**.
 - Weights change in the browser; percentiles never change with the view.
-- Communes with **0 bakeries**: `per_bakery = population` and flag `no_bakery = true` (shown as "aucune").
+- **Inhabitants per bakery, yours included** (decided Oct 2026): `per_bakery = population / (bakeries + 1)`,
+  i.e. the customers each bakery would have once yours opens. This separates the two cases that the old rule
+  (`population / bakeries`, and `population` when there is none) treated alike: with the same population,
+  a commune with no bakery now scores twice the value of a commune with one.
+- **No-bakery boost:** on top of that, communes with **0 bakeries** are ranked on
+  `per_bakery × NO_BAKERY_BOOST` (pipeline constant, default **1.5**), so they rank ~3× above a commune of the
+  same size with one bakery. The boost scales with population, so a 60-inhabitant hamlet stays low.
+  The raw value shown on sliders stays unboosted; flag `no_bakery = true`, bakery count shown as "aucune".
 - Category: Go ≥ 60, Maybe 40–59, Avoid < 40.
 - Presets (open question, §7): New opening, Takeover (sell_soon = High), Mobile.
 
@@ -115,6 +136,7 @@ Pre-render commune pages as static HTML at build time if possible: they are valu
 ## 7. Open questions (ask Yoann before building these)
 1. Product name and domain (Fournil is a working name).
 2. Start with 3 onboarding questions (model, where, type of place) or go straight to the map with presets?
+   *For the prototype: straight to the map with the "New opening" preset.*
 3. Takeover and new opening as presets of one score, or two separate scores?
 4. Which reference city to show as "distance to …" on the commune page (nearest city > 50k?).
-5. Is the crime criterion on by default? (Small-commune data is sparse.)
+5. ~~Is the crime criterion on by default?~~ **Decided:** yes, weight Low (1).

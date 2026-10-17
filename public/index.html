@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fournil — où ouvrir ou reprendre une boulangerie</title>
+  <meta name="description" content="Chaque commune de France notée à partir des données publiques, pour choisir où ouvrir ou reprendre une boulangerie.">
+  <link rel="preload" href="fonts/public-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="vendor/maplibre-gl-6.11.2/maplibre-gl.css">
+  <link rel="stylesheet" href="src/styles.css">
+  <script type="module" src="src/main.js"></script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" aria-labelledby="app-title">
+      <div class="brand">
+        <h1 id="app-title" class="brand-name" data-i18n="app.name"></h1>
+        <span class="badge" data-i18n="app.badge"></span>
+      </div>
+      <p class="intro" data-i18n="app.intro"></p>
+    </aside>
+    <main class="map-wrap">
+      <div id="map" class="map" role="region" data-i18n-aria-label="map.label"></div>
+    </main>
+  </div>
+</body>
+</html>
