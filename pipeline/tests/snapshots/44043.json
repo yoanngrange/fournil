@@ -1,0 +1,92 @@
+{
+ "pop": 7452,
+ "bakeries": 8,
+ "criteria": {
+  "per_bakery": {
+   "v": 828.0,
+   "pct": 746.0
+  },
+  "income": {
+   "v": 28020.0,
+   "pct": 767.0
+  },
+  "growth": {
+   "v": 0.6053,
+   "pct": 688.0
+  },
+  "crime": {
+   "v": 36.90284,
+   "pct": 8.0
+  },
+  "sell_soon": {
+   "v": null,
+   "pct": null
+  }
+ },
+ "history": [
+  [
+   1968,
+   4179
+  ],
+  [
+   1975,
+   4537
+  ],
+  [
+   1982,
+   4959
+  ],
+  [
+   1990,
+   5495
+  ],
+  [
+   1999,
+   5939
+  ],
+  [
+   2007,
+   6691
+  ],
+  [
+   2012,
+   6633
+  ],
+  [
+   2017,
+   7187
+  ],
+  [
+   2023,
+   7452
+  ]
+ ],
+ "income": {
+  "median": 28020.0,
+  "poverty_pct": 9.0,
+  "dep_median": 27150.0,
+  "france_median": 25920.0
+ },
+ "amenities": {
+  "bakeries": 8,
+  "supermarkets": 4,
+  "small_grocers": 4,
+  "butchers": 2,
+  "fishmongers": 0,
+  "restaurants": 29,
+  "pharmacies": 2,
+  "doctors": 9,
+  "primary_schools": 3,
+  "secondary_schools": 4,
+  "post": 1,
+  "stations": 1
+ },
+ "neighbours": [
+  "44063",
+  "44064",
+  "44108",
+  "44165",
+  "49301",
+  "85076"
+ ]
+}
