@@ -3,13 +3,17 @@
 import hashlib
 import json
 import shutil
+import time
 import urllib.request
+import zipfile
 from datetime import datetime, timezone
 
 from pipeline.config import RAW, SOURCES
 
 MANIFEST = RAW / "manifest.json"
 USER_AGENT = "Mozilla/5.0 (fournil data pipeline)"
+RETRIES = 4
+RETRY_WAIT_S = 20  # Insee's Melodi API limits requests per minute
 
 
 def _get(url: str):
@@ -30,6 +34,27 @@ def resolve_datagouv(spec: dict) -> dict:
         raise RuntimeError(f"No resource matching {spec} on data.gouv.fr")
     res = max(matches, key=lambda r: r["last_modified"])
     return {"url": res["url"], "published": res["last_modified"][:10], "title": res["title"]}
+
+
+MAGIC = {".zip": b"PK\x03\x04", ".parquet": b"PAR1"}
+
+
+def _check_format(path, suffix: str) -> None:
+    """Reject error pages served with a 200 status and truncated files before they reach the cache."""
+    with open(path, "rb") as f:
+        head = f.read(200)
+        if path.stat().st_size >= 4:
+            f.seek(-4, 2)
+        tail = f.read(4)
+    expected = MAGIC.get(suffix)
+    if expected and not head.startswith(expected):
+        raise ValueError(f"not a {suffix} file, starts with {head[:120]!r}")
+    if suffix == ".zip" and not zipfile.is_zipfile(path):
+        raise ValueError("truncated zip (no central directory)")
+    if suffix == ".parquet" and tail != b"PAR1":
+        raise ValueError("truncated parquet (no footer)")
+    if suffix == ".csv" and (not head or head.lstrip().startswith((b"<", b"{"))):
+        raise ValueError(f"not a CSV file, starts with {head[:120]!r}")
 
 
 def _sha256(path) -> str:
@@ -58,10 +83,23 @@ def fetch(source_id: str, refresh: bool = False) -> dict:
     target = RAW / f"{source_id}{suffix}"
     RAW.mkdir(parents=True, exist_ok=True)
     tmp = target.with_suffix(target.suffix + ".part")
-    print(f"  downloading {source_id} …", flush=True)
-    with _get(url) as r, open(tmp, "wb") as f:
-        shutil.copyfileobj(r, f, length=1 << 20)
+    for attempt in range(1, RETRIES + 1):
+        print(f"  downloading {source_id} (attempt {attempt}) …", flush=True)
+        try:
+            with _get(url) as r, open(tmp, "wb") as f:
+                expected = r.headers.get("Content-Length")
+                shutil.copyfileobj(r, f, length=1 << 20)
+            if expected and tmp.stat().st_size != int(expected):
+                raise ValueError(f"truncated: {tmp.stat().st_size} of {expected} bytes")
+            _check_format(tmp, suffix)
+            break
+        except (OSError, ValueError) as err:  # network errors, HTTP errors and wrong content
+            print(f"    failed: {err}", flush=True)
+            if attempt == RETRIES:
+                raise RuntimeError(f"could not download {source_id} from {url}") from err
+            time.sleep(RETRY_WAIT_S * attempt)
     tmp.replace(target)
+    print(f"    {target.stat().st_size / 1e6:.1f} MB", flush=True)
 
     entry = {
         "file": target.name,
