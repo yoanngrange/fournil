@@ -6,21 +6,77 @@
   <title>Fournil — où ouvrir ou reprendre une boulangerie</title>
   <meta name="description" content="Chaque commune de France notée à partir des données publiques, pour choisir où ouvrir ou reprendre une boulangerie.">
   <link rel="preload" href="fonts/public-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="data/communes-index.json" as="fetch" crossorigin>
   <link rel="stylesheet" href="vendor/maplibre-gl-6.11.2/maplibre-gl.css">
   <link rel="stylesheet" href="src/styles.css">
   <script type="module" src="src/main.js"></script>
 </head>
 <body>
   <div class="app">
-    <aside class="sidebar" aria-labelledby="app-title">
-      <div class="brand">
-        <h1 id="app-title" class="brand-name" data-i18n="app.name"></h1>
-        <span class="badge" data-i18n="app.badge"></span>
+    <aside class="sidebar" id="sidebar" aria-labelledby="app-title">
+      <button type="button" class="sheet-toggle" id="sheet-toggle" aria-expanded="false" aria-controls="sidebar-body">
+        <span data-i18n="filters.title"></span>
+      </button>
+      <div class="sidebar-body" id="sidebar-body">
+        <div class="brand">
+          <h1 id="app-title" class="brand-name" data-i18n="app.name"></h1>
+          <span class="badge" data-i18n="app.badge"></span>
+        </div>
+        <p class="intro" data-i18n="app.intro"></p>
+
+        <section class="filters" aria-labelledby="filters-title">
+          <div class="section-head">
+            <h2 id="filters-title" data-i18n="filters.title"></h2>
+            <button type="button" class="link-btn" id="reset" data-i18n="filters.reset"></button>
+          </div>
+          <p class="help" id="filters-help"></p>
+          <div id="criteria"></div>
+        </section>
+
+        <section aria-labelledby="top-title">
+          <h2 id="top-title" data-i18n="top.title"></h2>
+          <ol class="top-list" id="top-list"></ol>
+        </section>
+
+        <p class="sources-link"><a href="sources/" data-i18n="sources.link"></a></p>
       </div>
-      <p class="intro" data-i18n="app.intro"></p>
     </aside>
+
     <main class="map-wrap">
       <div id="map" class="map" role="region" data-i18n-aria-label="map.label"></div>
+
+      <div class="topbar">
+        <nav class="pill breadcrumb" data-i18n-aria-label="map.breadcrumb">
+          <span data-i18n="map.france"></span><span class="sep" aria-hidden="true">›</span><b id="dep-name"></b>
+        </nav>
+        <div class="pill counts" id="counts" aria-live="polite"></div>
+        <div class="grow"></div>
+        <div class="search">
+          <input type="search" id="search" class="pill" role="combobox" aria-autocomplete="list"
+                 aria-expanded="false" aria-controls="search-results" autocomplete="off"
+                 data-i18n-aria-label="search.label" data-i18n-placeholder="search.placeholder">
+          <ul id="search-results" role="listbox" hidden data-i18n-aria-label="search.label"></ul>
+          <span class="visually-hidden" id="search-status" aria-live="polite"></span>
+        </div>
+        <div class="pill zoom">
+          <button type="button" class="iconbtn" id="zoom-in" data-i18n-aria-label="map.zoomIn">+</button>
+          <button type="button" class="iconbtn" id="zoom-out" data-i18n-aria-label="map.zoomOut">−</button>
+          <button type="button" class="iconbtn" id="zoom-reset" data-i18n-aria-label="map.resetView">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="legend pill" role="group" data-i18n-aria-label="legend.title">
+        <div><span class="swatch" style="background:#4D9221"></span><span data-i18n-html="legend.go"></span></div>
+        <div><span class="swatch swatch-light" style="background:#ECEAE1"></span><span data-i18n-html="legend.maybe"></span></div>
+        <div><span class="swatch is-hatched" style="background:#DE77AE"></span><span data-i18n-html="legend.avoid"></span></div>
+        <div><span class="swatch" style="background:#D9D2C5"></span><span data-i18n="legend.out"></span></div>
+      </div>
+
+      <div class="tooltip" id="tooltip" role="tooltip" hidden></div>
+      <section class="card" id="card" role="dialog" aria-modal="false" aria-labelledby="card-title" hidden></section>
+      <div class="status" id="status" role="status"></div>
     </main>
   </div>
 </body>

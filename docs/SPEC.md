@@ -53,6 +53,10 @@ Mockups in `design/` (see `design/README.md`). Layout: left sidebar 380 px, map 
 - An **importance** select: Ignore / Low / Medium / High (weights 0–3). Population has no weight (filter only).
 - "Reset filters" link.
 - Communes outside any active range are shown as "filtered out" and excluded from counts.
+- *Implemented (M2):* a handle left at the end of its slider is **open** (no bound on that side), so panning
+  to bigger or smaller communes does not silently filter them out. Population and inhabitants per bakery
+  use a **logarithmic** slider (a city and villages share one range). A missing value never filters out.
+- *French labels:* Go / Maybe / Avoid are shown as **Favorable / À étudier / Défavorable**.
 
 Criteria (MVP):
 
