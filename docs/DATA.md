@@ -24,15 +24,15 @@ Items marked **VERIFY** were not confirmed when this guide was written; check th
 |---|---|---|
 | Population (current) | INSEE *Populations légales* (yearly) | Official population per commune. |
 | Age pyramid | INSEE census (RP), population by sex and 5-year age band, commune level | Group into 0–14, 15–29, 30–44, 45–59, 60–74, 75+ for the card; keep 5-year bands for the page. |
-| Population history | INSEE census *séries historiques* (1968 → latest) | For the "population over time" chart. **Growth (decided):** average annual rate between the two census vintages 6 years apart that INSEE itself compares (currently RP 2016 → RP 2022): `((P2022 / P2016)^(1/6) − 1) × 100`, in %/year. |
+| Population history | INSEE census *séries historiques* (1968 → latest) | For the "population over time" chart. **Growth (decided):** average annual rate between the two census vintages 6 years apart that INSEE itself compares (currently RP 2017 → RP 2023): `((P2023 / P2017)^(1/6) − 1) × 100`, in %/year. |
 | Households, housing, second homes, vacant | INSEE census (RP) housing tables | Second-home share matters: tourist communes have strong seasonal demand. |
 | Commuting | INSEE census *mobilités professionnelles* (home → work flows) | "% of residents working outside the commune" and main destination. |
 | Income, poverty | INSEE **Filosofi**, commune level | Statistical secrecy: **nothing is published under 50 fiscal households and 100 people**; the median is available from that threshold; the full set (incl. detailed breakdowns) generally from 1,000 households or 2,000 people. Expect gaps for small villages. |
-| Existing bakeries (count) — **reference** | INSEE **BPE** (Base permanente des équipements), bakery equipment code | **Decided (Oct 2026): BPE is the count used for scoring.** INSEE cleans it (one point of sale = one equipment), whereas SIRENE also lists head offices, industrial bakeries and dormant establishments still flagged active. |
-| Existing bakeries — cross-check | **SIRENE** stock of establishments (`StockEtablissement`), active (`etatAdministratifEtablissement = A`), `activitePrincipaleEtablissement` in **10.71C** (boulangerie et boulangerie-pâtisserie). Also count 10.71D (pâtisserie) and 47.24Z (retail of bread/pastry) separately. | Location by `codeCommuneEtablissement`. Used only to log the gap with BPE (per département) and for the "local economy" figures. |
-| Bakeries, shops, services (count) | INSEE **BPE** | Codes in the 2020 list: **B203 Boulangerie**, B101 Hypermarché, B102 Supermarché, B202 Épicerie, B204 Boucherie charcuterie, B206 Poissonnerie. **VERIFY** codes in the vintage you download (nomenclature changes). Also schools, pharmacy, doctors, post office, station from BPE. |
+| Existing bakeries (count) — **reference** | INSEE **BPE** (Base permanente des équipements) 2025, code **B207 Boulangerie-pâtisserie** | **Decided (Oct 2026): BPE is the count used for scoring.** INSEE cleans it (one point of sale = one equipment), whereas SIRENE also lists head offices, industrial bakeries and dormant establishments still flagged active. |
+| Existing bakeries — cross-check | **SIRENE** stock of establishments (`StockEtablissement`), active (`etatAdministratifEtablissement = A`), `activitePrincipaleEtablissement` in **10.71C** (boulangerie et boulangerie-pâtisserie). Also count 10.71D (pâtisserie) and 47.24Z (retail of bread/pastry) separately. | Location by `codeCommuneEtablissement`. Used only to log the gap with BPE and for the "local economy" figures. The quality check compares BPE B207 with SIRENE **10.71C + 10.71D** (closest definition; 46,657 vs 50,675 in Oct 2026, gap 8.6 %). No SIRENE code set reproduces BPE exactly: INSEE cleans BPE. |
+| Bakeries, shops, services (count) | INSEE **BPE** | **Verified on BPE 2025:** B207 Boulangerie-pâtisserie, B104 Hypermarché, B105 Supermarché, B201 Supérette, B202 Épicerie, B204 Boucherie charcuterie, B206 Poissonnerie, A504 Restaurant, D307 Pharmacie, D265 Médecin généraliste, A206–A208 poste, E107–E109 gares, C107–C109 écoles, C201/C301–C303 collèges et lycées (full list in `pipeline/config.py`; codes change between vintages). Also schools, pharmacy, doctors, post office, station from BPE. |
 | Businesses by sector | SIRENE establishments, grouped by NAF section | For "local economy" bars. |
-| Crime | **SSMSI** — *Bases statistiques communale, départementale et régionale de la délinquance enregistrée par la police et la gendarmerie nationales* (data.gouv.fr) | Rates per 1,000 inhabitants by indicator. Small counts are suppressed for small communes → treat as missing. **Decided:** `crime` = sum of the rates for burglaries of homes, physical violence and thefts (excluding fraud and drug offences, which reflect police activity more than local safety), per 1,000 inhabitants. Exact indicator labels listed in `pipeline/` and on the sources page. |
+| Crime | **SSMSI** — *Bases statistiques communale, départementale et régionale de la délinquance enregistrée par la police et la gendarmerie nationales* (data.gouv.fr) | Rates per 1,000 inhabitants by indicator. Small counts are suppressed for small communes → treat as missing. **Decided:** `crime` = burglaries of homes + physical violence outside the family + thefts (armed, violent, non-violent against people), per 1,000 inhabitants, year 2025 (excluding fraud and drug offences, which reflect police activity more than local safety). **Withheld counts:** SSMSI publishes 0 and counts ≥ 5 and withholds 1–4. A withheld indicator counts as 2.5; the commune's value is dropped when that uncertainty exceeds 5 offences per 1,000 inhabitants. Coverage: 23 % of communes nationally, 72 % in dep 44 (vs 7 % if any withheld count made the value missing). Paris, Lyon, Marseille are published per arrondissement and summed from counts. |
 | Property prices | **DVF** (Demandes de valeurs foncières), Etalab "géo-DVF" | Median €/m² per commune over the last 3 years, houses and flats separately. Terms forbid re-identifying people or letting search engines index individual sales — **publish aggregates only**. |
 | Likely to sell soon | **RNE** (Registre national des entreprises, INPI API): directors of bakery companies with birth month/year | Requires a free INPI account. **VERIFY** INPI reuse terms. Count bakeries whose youngest director is ≥ 60 (configurable). Fallback without RNE: SIRENE company age (`dateCreationUniteLegale` ≥ 25 years) as a weaker signal. **Aggregate per commune only.** |
 | Tourism (optional) | INSEE tourist accommodation capacity by commune | Beds in hotels/campsites; later. |
@@ -78,3 +78,27 @@ commune/{code}.json          everything for the commune page (pyramid, history, 
 - Bakery count from SIRENE vs BPE differs by < 15 % nationally (log the per-département gap).
 - Percentiles: min 0, max 1000 for every criterion that has values.
 - Snapshot test: commune 44043 values change only when sources change.
+
+## 6. Implementation notes (M1, October 2026)
+
+What the real files taught us; `pipeline/config.py` holds every URL, vintage and code.
+
+- **Insee now distributes through Melodi** (`https://api.insee.fr/melodi/file/<DATASET>/<FILE>`): zipped CSV in
+  long format (one row per geography × measure). Always filter `GEO_OBJECT = COM`: the same code can also be a
+  bassin de vie, an aire d'attraction, etc. Datasets used: `DS_POPULATIONS_REFERENCE` (PMUN 2023),
+  `DS_RP_SERIE_HISTORIQUE` (1968–2023, also dwellings by occupancy), `DS_RP_POPULATION_PRINC` (sex × age),
+  `DS_FILOSOFI_CC` (2023: `MED_SL`, `PR_MD60`), `DS_BPE` (2025).
+- These files are already published on the **2026 geography**: no code mapping was needed in Oct 2026.
+  The mapping (COG history + arrondissements → commune) still runs and fails the build above 0.1 % unmapped.
+- **Age bands** published by sex at commune level are 0–14, 15–24, 25–39, 40–54, 55–64, 65–79, 80+
+  (not the 15-year bands of the mockup). The UI uses these.
+- **Second homes and vacant dwellings** come from the census history file (2023), no separate housing file.
+- **Boundaries:** ADMIN EXPRESS COG CARTO 2026 as GeoParquet (`data.geopf.fr`), no 7z to unpack.
+  Simplified with `shapely.coverage_simplify` (40 m) on the whole country at once, so neighbouring communes
+  and départements keep identical borders. Centre point = town hall (chef-lieu layer), or a point inside the
+  polygon for the 6 uninhabited Meuse communes that have none.
+- **SIRENE** is no longer split by département: the national stock (Parquet, 2.2 GB) is read with column and
+  row filters. Paris/Lyon/Marseille establishments carry arrondissement codes and are summed into the commune.
+- **Percentiles are always national**, even when only some départements are exported
+  (`--dep 44` still ranks against all of France), so colours will not shift in M3.
+- **Uninhabited communes** (population 0) are not scored.
