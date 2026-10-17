@@ -1,8 +1,10 @@
-name: Deploy to GitHub Pages
+name: Build data and deploy to GitHub Pages
 
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: "0 5 3 * *" # monthly, after the SIRENE stock is republished on the 1st
   workflow_dispatch:
 
 permissions:
@@ -14,13 +16,38 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+env:
+  DEPARTEMENTS: "44" # prototype scope; `--all` from milestone M3
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v10
+        with:
+          python-version: "3.12"
+
+      - name: Month (cache key for raw downloads)
+        id: month
+        run: echo "value=$(date -u +%Y-%m)" >> "$GITHUB_OUTPUT"
+
+      # Raw downloads (~2.5 GB, mostly SIRENE) are reused within a month and for unchanged sources.
+      - uses: actions/cache@v4
+        with:
+          path: pipeline/raw
+          key: raw-${{ steps.month.outputs.value }}-${{ hashFiles('pipeline/config.py') }}
+
+      - name: Build data
+        run: uv run python -m pipeline.run --dep $DEPARTEMENTS
+
+      - name: Test data
+        run: uv run pytest -q
+
       - name: Assemble site
         run: bash scripts/build_site.sh
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -28,7 +55,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

@@ -35,8 +35,10 @@ reference city on the commune page · crime criterion on by default.
 ## Run it locally
 
 ```
-uv sync                              # Python 3.12 + dev tools (first time only)
-uv run python scripts/serve.py       # http://localhost:8000/
+uv sync                                    # Python 3.12 + dev tools (first time only)
+uv run python -m pipeline.run --dep 44     # download sources (~2.5 GB, cached) and build public/data/
+uv run pytest                              # data checks
+uv run python scripts/serve.py             # http://localhost:8000/
 ```
 
 The site is plain HTML/CSS/JS (no build step). `scripts/build_site.sh` assembles `public/` + `src/`

@@ -16,6 +16,10 @@ Start every milestone on Loire-Atlantique (44), then generalise.
   SIRENE (filtered to dep 44 for speed), BPE, SSMSI, DVF.
 - Build every file of DATA.md §4 for dep 44 only (percentiles temporarily computed on 44).
 - **Done when:** `python -m pipeline.run --dep 44` writes all outputs and the tests pass.
+- *Done (Oct 2026):* all sources except DVF (deferred to M4, commune page) and RNE (M6). Percentiles are
+  already **national** (statistics are read for all of France anyway), so M3 will not shift colours.
+  Run: `uv run python -m pipeline.run --dep 44` (~1 min with cached downloads), then `uv run pytest`.
+  See DATA.md §6 for what the real files required.
 
 ## M2 — Commune map (dep 44)
 - Commune polygons coloured by score; Avoid bins hatched (MapLibre `fill-pattern`).
@@ -25,6 +29,10 @@ Start every milestone on Loire-Atlantique (44), then generalise.
 - Top bar counts, legend, URL state.
 - First version of the **Sources & method page** (SPEC §3.5), linked from the sidebar and the card.
 - **Done when:** behaviour matches the mockup on dep 44, at 1440 px and 390 px.
+- *Done (Oct 2026):* plus search (keyboard combobox) and a "best communes on screen" list for keyboard
+  access, shortlist star (localStorage). The GitHub Action now builds the data (dep 44), runs the tests and
+  deploys; it also reruns monthly. Not in M2: delivery switch (M5), commune page link (M4), `sell_soon` row
+  (hidden until M6 has data).
 
 ## M3 — All of France
 - Pipeline `--all`; national percentiles; per-département geometry loaded on demand.
