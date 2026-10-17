@@ -8,6 +8,8 @@ Start every milestone on Loire-Atlantique (44), then generalise.
 - MapLibre GL JS added (npm or a pinned copy in `public/vendor/`), `index.html` showing an empty map.
 - GitHub Action that deploys `public/` + `src/` to GitHub Pages.
 - **Done when:** the empty map is live on Pages.
+- *Done (Oct 2026):* MapLibre 6.11.2 pinned in `public/vendor/` (ES modules, no build step), fonts self-hosted
+  in `public/fonts/`. Local preview: `uv run python scripts/serve.py`. Site assembled by `scripts/build_site.sh`.
 
 ## M1 — Data pipeline for one département
 - `fetch.py` for: COG, ADMIN EXPRESS, populations légales, RP age/sex, séries historiques, Filosofi,
@@ -21,6 +23,7 @@ Start every milestone on Loire-Atlantique (44), then generalise.
 - Sidebar: range sliders whose bounds follow the visible communes (`map.on('moveend')` +
   `queryRenderedFeatures` or a bbox test on centroids), importance selects, reset.
 - Top bar counts, legend, URL state.
+- First version of the **Sources & method page** (SPEC §3.5), linked from the sidebar and the card.
 - **Done when:** behaviour matches the mockup on dep 44, at 1440 px and 390 px.
 
 ## M3 — All of France
@@ -34,7 +37,8 @@ Start every milestone on Loire-Atlantique (44), then generalise.
 ## M4 — Commune page
 - Route `/commune/{code}` rendered from `commune/{code}.json`; layout as `design/Commune.dc.html`.
 - Generated one-line summary (template rules, not AI).
-- Pre-render static HTML for all communes at build time (SEO), if build time stays reasonable.
+- Pre-render static HTML for all communes at build time (SEO): one command, same locally and in CI,
+  output deployed as the Pages artifact and never committed (SPEC §3.4).
 - **Done when:** every section works for Clisson (44043), a tiny village with missing Filosofi data,
   and Paris.
 

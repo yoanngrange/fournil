@@ -15,3 +15,6 @@ public/data/
 
 # Node
 node_modules/
+
+# Assembled site
+_site/

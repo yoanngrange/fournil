@@ -1,0 +1,61 @@
+/* Fournil — design tokens from design/README.md */
+
+@font-face { font-family: 'Public Sans'; font-weight: 400; font-display: swap; src: url('../fonts/public-sans-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Public Sans'; font-weight: 500; font-display: swap; src: url('../fonts/public-sans-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Public Sans'; font-weight: 600; font-display: swap; src: url('../fonts/public-sans-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Public Sans'; font-weight: 700; font-display: swap; src: url('../fonts/public-sans-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Fraunces'; font-weight: 500; font-display: swap; src: url('../fonts/fraunces-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Fraunces'; font-weight: 700; font-display: swap; src: url('../fonts/fraunces-latin-700-normal.woff2') format('woff2'); }
+
+:root {
+  --page: #F4EFE6;
+  --sidebar: #FBF8F2;
+  --surface: #FFFDF8;
+  --map-bg: #E9E3D7;
+  --border: #E3DACB;
+  --border-strong: #D8CDBB;
+  --text: #1F1B16;
+  --text-2: #5A5247;
+  --muted: #6E655A;
+  --accent: #7A4B12;
+  --action: #3D6B1E;
+
+  --sidebar-w: 380px;
+  --radius-control: 10px;
+  --radius-card: 14px;
+  --font-ui: 'Public Sans', system-ui, sans-serif;
+  --font-display: 'Fraunces', Georgia, serif;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--page); color: var(--text); font-family: var(--font-ui); font-size: 15px; line-height: 1.45; }
+a { color: var(--accent); }
+
+.app { display: flex; height: 100%; }
+
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  overflow-y: auto;
+  padding: 24px;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-name { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 28px; }
+.badge {
+  font-size: 12px; font-weight: 600; color: var(--text-2);
+  padding: 2px 8px; border: 1px solid var(--border-strong); border-radius: 999px;
+}
+.intro { color: var(--text-2); margin: 12px 0 0; }
+
+.map-wrap { position: relative; flex: 1; min-width: 0; }
+.map { position: absolute; inset: 0; background: var(--map-bg); }
+
+/* Phones: map on top, sidebar becomes a bottom panel (full bottom sheet comes in M2). */
+@media (max-width: 720px) {
+  .app { flex-direction: column-reverse; }
+  .sidebar { width: auto; max-height: 40%; border-right: 0; border-top: 1px solid var(--border); padding: 16px; }
+  .brand-name { font-size: 22px; }
+}

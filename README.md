@@ -31,3 +31,13 @@ details in a pinned card + a full commune page · paid features later · leads o
 ## Still open (see SPEC §7)
 Product name · onboarding questions or not · takeover/new-opening presets vs separate scores ·
 reference city on the commune page · crime criterion on by default.
+
+## Run it locally
+
+```
+uv sync                              # Python 3.12 + dev tools (first time only)
+uv run python scripts/serve.py       # http://localhost:8000/
+```
+
+The site is plain HTML/CSS/JS (no build step). `scripts/build_site.sh` assembles `public/` + `src/`
+into `_site/`, which the GitHub Action deploys to https://yoanngrange.github.io/fournil/ on every push to `main`.
