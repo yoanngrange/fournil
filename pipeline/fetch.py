@@ -12,13 +12,43 @@ from pipeline.config import RAW, SOURCES
 
 MANIFEST = RAW / "manifest.json"
 USER_AGENT = "Mozilla/5.0 (fournil data pipeline)"
-RETRIES = 4
-RETRY_WAIT_S = 20  # Insee's Melodi API limits requests per minute
+RETRIES = 8
+RETRY_WAIT_S = 10
 
 
-def _get(url: str):
-    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+def _get(url: str, headers: dict | None = None):
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, **(headers or {})})
     return urllib.request.urlopen(req, timeout=600)
+
+
+def _download(url: str, target) -> None:
+    """Download url to target, resuming with HTTP Range when the server cuts the transfer.
+
+    Insee's servers close long transfers to GitHub's runners part-way; every attempt continues
+    from the bytes already received.
+    """
+    total = None
+    for attempt in range(1, RETRIES + 1):
+        have = target.stat().st_size if attempt > 1 and target.exists() else 0
+        try:
+            with _get(url, {"Range": f"bytes={have}-"} if have else None) as r:
+                if have and r.status != 206:  # range ignored: start again
+                    have = 0
+                length = r.headers.get("Content-Length")
+                if length and total is None:
+                    total = have + int(length)
+                with open(target, "ab" if have else "wb") as f:
+                    shutil.copyfileobj(r, f, length=1 << 20)
+        except OSError as err:  # network and HTTP errors
+            print(f"    attempt {attempt}: {err}", flush=True)
+        size = target.stat().st_size if target.exists() else 0
+        if total is not None and size >= total:
+            return
+        if total is None and size:
+            return  # no announced length: nothing to compare with
+        print(f"    attempt {attempt}: {size} of {total} bytes, resuming", flush=True)
+        time.sleep(RETRY_WAIT_S)
+    raise RuntimeError(f"could not download {url}")
 
 
 def resolve_datagouv(spec: dict) -> dict:
@@ -83,21 +113,9 @@ def fetch(source_id: str, refresh: bool = False) -> dict:
     target = RAW / f"{source_id}{suffix}"
     RAW.mkdir(parents=True, exist_ok=True)
     tmp = target.with_suffix(target.suffix + ".part")
-    for attempt in range(1, RETRIES + 1):
-        print(f"  downloading {source_id} (attempt {attempt}) …", flush=True)
-        try:
-            with _get(url) as r, open(tmp, "wb") as f:
-                expected = r.headers.get("Content-Length")
-                shutil.copyfileobj(r, f, length=1 << 20)
-            if expected and tmp.stat().st_size != int(expected):
-                raise ValueError(f"truncated: {tmp.stat().st_size} of {expected} bytes")
-            _check_format(tmp, suffix)
-            break
-        except (OSError, ValueError) as err:  # network errors, HTTP errors and wrong content
-            print(f"    failed: {err}", flush=True)
-            if attempt == RETRIES:
-                raise RuntimeError(f"could not download {source_id} from {url}") from err
-            time.sleep(RETRY_WAIT_S * attempt)
+    print(f"  downloading {source_id} …", flush=True)
+    _download(url, tmp)
+    _check_format(tmp, suffix)  # an error page served with status 200 must not reach the cache
     tmp.replace(target)
     print(f"    {target.stat().st_size / 1e6:.1f} MB", flush=True)
 
