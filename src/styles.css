@@ -280,3 +280,8 @@ body.doc { height: auto; background: var(--sidebar); }
 .eco-price span { display: flex; flex-direction: column; gap: 2px; }
 .eco-price small { line-height: 1.35; }
 .eco-price b { white-space: nowrap; align-self: center; }
+.card h4 { margin: 12px 0 2px; font-size: 12px; font-weight: 600; color: #D9D0C2; }
+.card-source { margin: -4px 0 8px; font-size: 11px; color: #A39A8C; }
+.kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.kpi b { font-size: 18px; }
+.kpi small { font-size: 11px; color: var(--dark-muted); }

@@ -66,7 +66,7 @@ Criteria (MVP):
 | key | label (FR UI) | unit | better | weight (our recipe) |
 |---|---|---|---|---|
 | `pop` | Population | inhabitants | — (filter only) | — |
-| `per_bakery` | Habitants par boulangerie (la vôtre comprise) | inhabitants | higher | High (3) |
+| `per_bakery` | Habitants par boulangerie | inhabitants | higher | High (3) |
 | `income` | Revenu médian | €/year/UC | higher | Medium (2) |
 | `growth` | Évolution de la population | %/year | higher | Medium (2) |
 | `crime` | Taux de délinquance | offences /1,000 | lower | Low (1), on by default |
@@ -119,14 +119,13 @@ Kept up to date with every milestone that adds or changes a criterion.
 - Client computes `score = round(100 × Σ(wᵢ × pᵢ) / Σ(wᵢ))` over criteria with weight > 0 **and a value**.
 - Weights are fixed by us (see §3.2), not set by users; percentiles never change with the view.
   Future presets (takeover, mobile) would be alternative recipes chosen by us, not free weights.
-- **Inhabitants per bakery, yours included** (decided Oct 2026): `per_bakery = population / (bakeries + 1)`,
-  i.e. the customers each bakery would have once yours opens. This separates the two cases that the old rule
-  (`population / bakeries`, and `population` when there is none) treated alike: with the same population,
-  a commune with no bakery now scores twice the value of a commune with one.
-- **No-bakery boost:** on top of that, communes with **0 bakeries** are ranked on
-  `per_bakery × NO_BAKERY_BOOST` (pipeline constant, default **1.5**), so they rank ~3× above a commune of the
-  same size with one bakery. The boost scales with population, so a 60-inhabitant hamlet stays low.
-  The raw value shown on sliders stays unboosted; flag `no_bakery = true`, bakery count shown as "aucune".
+- **Inhabitants per bakery** (revised Oct 19, 2026): `per_bakery = population / bakeries`, the real figure the
+  user expects; communes with no bakery have no value (shown "aucune boulangerie", ignored by that slider).
+  *(An Oct 17 version used `population / (bakeries + 1)`, "yours included"; dropped because the displayed figure
+  no longer matched what users read.)*
+- **No-bakery boost:** for ranking, a commune with **0 bakeries** counts as `population × NO_BAKERY_BOOST`
+  (pipeline constant, **3**), so it ranks 3× above a commune of the same size with one bakery. The boost scales
+  with population, so a 60-inhabitant hamlet stays low.
 - Category: Go ≥ 60, Maybe 40–59, Avoid < 40.
 - Presets (open question, §7): New opening, Takeover (sell_soon = High), Mobile.
 

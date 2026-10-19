@@ -126,6 +126,50 @@ SOURCES = {
         "licence": "Licence Ouverte 2.0",
         "page": "https://bodacc-datadila.opendatasoft.com/explore/dataset/annonces-commerciales/",
     },
+    "sirene_ul": {
+        "name": "Base Sirene des unités légales (noms des entreprises)",
+        "producer": "Insee",
+        "vintage": "stock mensuel",
+        "datagouv": {
+            "dataset": "base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret",
+            "title_startswith": "Sirene : Fichier StockUniteLegale -",
+            "format": "parquet",
+        },
+        "licence": "Licence Ouverte 2.0",
+        "page": "https://www.data.gouv.fr/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret",
+    },
+    "elus_maires": {
+        "name": "Répertoire national des élus — maires",
+        "producer": "Ministère de l'Intérieur",
+        "vintage": "2026",
+        "datagouv": {"dataset": "repertoire-national-des-elus-1", "title_startswith": "elus-maires", "format": "csv"},
+        "licence": "Licence Ouverte 2.0",
+        "page": "https://www.data.gouv.fr/datasets/repertoire-national-des-elus-1",
+    },
+    "municipales_t1": {
+        "name": "Élections municipales 2026 — résultats du 1er tour par commune",
+        "producer": "Ministère de l'Intérieur",
+        "vintage": "15 mars 2026",
+        "datagouv": {
+            "dataset": "elections-municipales-2026-resultats-du-premier-tour",
+            "title_startswith": "Municipales 2026 - Résultats - Communes",
+            "format": "csv",
+        },
+        "licence": "Licence Ouverte 2.0",
+        "page": "https://www.data.gouv.fr/datasets/elections-municipales-2026-resultats-du-premier-tour",
+    },
+    "municipales_t2": {
+        "name": "Élections municipales 2026 — résultats du 2nd tour par commune",
+        "producer": "Ministère de l'Intérieur",
+        "vintage": "22 mars 2026",
+        "datagouv": {
+            "dataset": "elections-municipales-2026-resultats-du-second-tour",
+            "title_startswith": "Municipales 2026 - Résultats - Communes",
+            "format": "csv",
+        },
+        "licence": "Licence Ouverte 2.0",
+        "page": "https://www.data.gouv.fr/datasets/elections-municipales-2026-resultats-du-second-tour",
+    },
     "sirene": {
         "name": "Base Sirene des établissements",
         "producer": "Insee",
@@ -188,7 +232,7 @@ CRIME_INDICATORS = [
 
 # --- Scoring (docs/SPEC.md §4) ---
 GROWTH_FROM, GROWTH_TO = 2017, 2023  # census years compared for the yearly growth rate
-NO_BAKERY_BOOST = 1.5  # communes without a bakery are ranked on per_bakery × this factor
+NO_BAKERY_BOOST = 3  # a commune without a bakery ranks as if it had this × its population per bakery
 CRITERIA = ["per_bakery", "income", "growth", "crime", "sell_soon"]
 LOWER_IS_BETTER = {"crime"}
 

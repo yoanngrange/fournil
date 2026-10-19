@@ -24,11 +24,11 @@ def test_crime_is_inverted_and_no_bakery_is_boosted():
         index=["none", "one", "big", "tiny"],
     )
     raw = score.criteria(df)
-    assert raw.at["none", "per_bakery"] == 1000  # yours included: 1000 / (0 + 1)
-    assert raw.at["one", "per_bakery"] == 500
-    pct = score.percentiles(raw, df.bakeries)
+    assert np.isnan(raw.at["none", "per_bakery"])  # no bakery: no ratio, shown as "aucune"
+    assert raw.at["one", "per_bakery"] == 1000
+    pct = score.percentiles(raw, df)
     assert pct.at["none", "per_bakery"] > pct.at["one", "per_bakery"]
-    assert pct.at["none", "per_bakery"] > pct.at["big", "per_bakery"]  # 1000 × 1.5 > 2000 / 2
+    assert pct.at["none", "per_bakery"] > pct.at["big", "per_bakery"]  # 1000 × 3 > 2000 / 1
     assert pct.at["none", "crime"] == 1000  # lowest crime ranks best
     assert np.isnan(pct.at["tiny", "crime"])
     assert pct["sell_soon"].isna().all()

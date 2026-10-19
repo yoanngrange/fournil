@@ -1,6 +1,5 @@
-// Pinned commune card: score, key figures, age pyramid, local economy, bakery market, score breakdown.
+// Pinned commune card: score, demography, bakeries, social, age pyramid, local economy, bakery market, politics.
 import t from './i18n/fr.js';
-import { CRITERIA, BIN_COLOURS } from './lib/scoring.js';
 import { fmtCriterion, fmtEuro, fmtInt, fmtPct, tr } from './lib/format.js';
 
 const SHORTLIST_KEY = 'fournil.shortlist';
@@ -39,80 +38,115 @@ export function createCard(root, { onClose, meta, fonds }) {
     if (e.key === 'Escape') onClose();
   });
 
-  function kpi(label, value) {
-    return `<div class="kpi"><span>${label}</span><b>${value}</b></div>`;
+  const sireneMonth = (() => {
+    const d = meta.sources.find((x) => x.id === 'sirene')?.published;
+    return d ? new Date(d).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }) : '';
+  })();
+
+  function kpi(label, value, sub = '') {
+    return `<div class="kpi"><span>${label}</span><b>${value}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
+  }
+
+  /** A card section; `source` (producer and year) sits under the title so every figure carries it. */
+  function section(id, title, source, body) {
+    return `<section aria-labelledby="${id}"><h3 id="${id}">${title}</h3><p class="card-source">${source}</p>${body}</section>`;
+  }
+
+  const line = (label, value, hint = '') =>
+    `<div class="eco-row"><span>${label}${hint ? ` <small>${hint}</small>` : ''}</span><b>${value}</b></div>`;
+
+  function pyramidBlock(page) {
+    const total = [...page.pyramid.m, ...page.pyramid.f].reduce((a, b) => a + (b || 0), 0) || 1;
+    const max = Math.max(...page.pyramid.m, ...page.pyramid.f) || 1;
+    const rows = page.pyramid.bands
+      .map((band, i) => ({ band, m: page.pyramid.m[i] || 0, f: page.pyramid.f[i] || 0 }))
+      .reverse()
+      .map(({ band, m, f }) => {
+        const mp = ((100 * m) / total).toFixed(1).replace('.', ',');
+        const fp = ((100 * f) / total).toFixed(1).replace('.', ',');
+        return `<div class="pyr-row" role="listitem" aria-label="${tr('card.pyramidRow', { band, m: mp, f: fp })}">
+          <div class="pyr-m"><span>${mp}</span><i style="width:${(100 * m) / max}%"></i></div>
+          <div class="pyr-band" aria-hidden="true">${band}</div>
+          <div class="pyr-f"><i style="width:${(100 * f) / max}%"></i><span>${fp}</span></div>
+        </div>`;
+      })
+      .join('');
+    return `<div class="pyr-head" aria-hidden="true"><span>${t['card.men']}</span><span>${t['card.women']}</span></div>
+      <div role="list">${rows}</div>`;
+  }
+
+  function economyBlock(page) {
+    const a = page.amenities;
+    const b = page.businesses;
+    const food = a.small_grocers + a.butchers + a.fishmongers;
+    const sizes = Object.entries(b.by_size)
+      .map(([k, n]) => line(t[`card.size.${k}`], fmtInt(n)))
+      .join('');
+    const employers = b.main_employers.length
+      ? b.main_employers.map((e) => line(esc(e.name), tr('card.employees', { n: e.employees }))).join('')
+      : `<p class="card-muted small">${t['card.noMainEmployer']}</p>`;
+    return [
+      line(t['card.establishments'], fmtInt(b.total)),
+      line(t['card.foodShops'], fmtInt(food), t['card.foodShops.hint']),
+      line(t['card.supermarkets'], fmtInt(a.supermarkets)),
+      line(t['card.cafesRestaurants'], fmtInt(b.cafes + a.restaurants)),
+      line(t['card.secondHomes'], fmtPct(page.housing.second_homes_pct)),
+      `<h4>${t['card.bySize']}</h4>`,
+      sizes,
+      `<h4>${t['card.mainEmployers']}</h4>`,
+      employers,
+    ].join('');
+  }
+
+  function marketBlock(c, view, page) {
+    const h = page.bakery_history;
+    const dep = fonds.departements[c.dep];
+    const prices = dep || fonds.france;
+    const since = new Date(fonds.since).getFullYear();
+    const priceHint = dep
+      ? tr('card.fondsDep', { dep: esc(view.depName), n: fmtInt(dep.n), since, q1: fmtEuro(dep.q1), q3: fmtEuro(dep.q3) })
+      : tr('card.fondsFrance', { n: fmtInt(prices.n), since, q1: fmtEuro(prices.q1), q3: fmtEuro(prices.q3) });
+    return [
+      `<p class="card-muted small">${tr('card.history', { since: h.since })}</p>`,
+      line(t['card.takeovers'], fmtInt(h.takeovers)),
+      line(t['card.openings'], fmtInt(h.openings)),
+      line(t['card.closures'], fmtInt(h.closures)),
+      `<div class="eco-row eco-price"><span>${t['card.fonds']}<small>${priceHint}</small></span><b>${fmtEuro(prices.median)}</b></div>`,
+    ].join('');
+  }
+
+  const nuance = (code) => (code ? t[`nuance.${code}`] || code : t['card.noNuance']);
+  const pct1 = (x) => (x == null ? '—' : `${x.toFixed(1).replace('.', ',')} %`);
+
+  function politicsBlock(pol) {
+    if (!pol || (!pol.mayor && !pol.rounds.length)) return `<p class="card-muted small">${t['card.noPolitics']}</p>`;
+    const head = [
+      pol.mayor ? line(t['card.mayor'], esc(pol.mayor)) : '',
+      pol.list ? line(t['card.mayorList'], esc(pol.list)) : '',
+      pol.list ? line(t['card.nuance'], nuance(pol.nuance)) : '',
+    ].join('');
+    const rounds = pol.rounds
+      .map((r) => {
+        const lists = r.lists
+          .slice(0, 4)
+          .map((l) => line(esc(l.name), pct1(l.pct), nuance(l.nuance)))
+          .join('');
+        const more = r.lists.length > 4 ? `<p class="card-muted small">${tr('card.moreLists', { n: r.lists.length - 4 })}</p>` : '';
+        return `<h4>${tr('card.round', { n: r.round === 1 ? '1er' : '2nd', turnout: pct1(r.turnout) })}</h4>${lists}${more}`;
+      })
+      .join('');
+    return head + rounds;
   }
 
   function render(c, view, page) {
-    const perBakery = c.bakeries ? fmtInt(c.pop / c.bakeries) : t['card.none'];
     const scoreText =
       view.score == null
         ? t['cat.unknown']
         : tr(view.filteredOut ? 'card.outOfFiltered' : 'card.outOf', { cat: t[`cat.${view.cat}`] });
     const starred = shortlist.has(c.code);
-
-    let pyramid = `<p class="card-muted">${t['card.loading']}</p>`;
-    let economy = '';
-    let market = '';
-    if (page) {
-      const total = [...page.pyramid.m, ...page.pyramid.f].reduce((a, b) => a + (b || 0), 0) || 1;
-      const max = Math.max(...page.pyramid.m, ...page.pyramid.f) || 1;
-      const rows = page.pyramid.bands
-        .map((band, i) => ({ band, m: page.pyramid.m[i] || 0, f: page.pyramid.f[i] || 0 }))
-        .reverse()
-        .map(({ band, m, f }) => {
-          const mp = ((100 * m) / total).toFixed(1).replace('.', ',');
-          const fp = ((100 * f) / total).toFixed(1).replace('.', ',');
-          return `<div class="pyr-row" role="listitem" aria-label="${tr('card.pyramidRow', { band, m: mp, f: fp })}">
-            <div class="pyr-m"><span>${mp}</span><i style="width:${(100 * m) / max}%"></i></div>
-            <div class="pyr-band" aria-hidden="true">${band}</div>
-            <div class="pyr-f"><i style="width:${(100 * f) / max}%"></i><span>${fp}</span></div>
-          </div>`;
-        })
-        .join('');
-      pyramid = `<div class="pyr-head" aria-hidden="true"><span>${t['card.men']}</span><span>${t['card.women']}</span></div>
-        <div role="list">${rows}</div>`;
-
-      const a = page.amenities;
-      const food = a.small_grocers + a.butchers + a.fishmongers;
-      const line = (label, value, hint = '') =>
-        `<div class="eco-row"><span>${label}${hint ? ` <small>${hint}</small>` : ''}</span><b>${value}</b></div>`;
-      economy = [
-        line(t['card.establishments'], fmtInt(page.businesses.total)),
-        line(t['card.foodShops'], fmtInt(food), t['card.foodShops.hint']),
-        line(t['card.supermarkets'], fmtInt(a.supermarkets)),
-        line(t['card.cafesRestaurants'], fmtInt(page.businesses.cafes + a.restaurants)),
-        line(t['card.secondHomes'], fmtPct(page.housing.second_homes_pct)),
-      ].join('');
-
-      const h = page.bakery_history;
-      const dep = fonds.departements[c.dep];
-      const prices = dep || fonds.france;
-      const since = new Date(fonds.since).getFullYear();
-      const priceHint = dep
-        ? tr('card.fondsDep', { dep: esc(view.depName), n: fmtInt(dep.n), since, q1: fmtEuro(dep.q1), q3: fmtEuro(dep.q3) })
-        : tr('card.fondsFrance', { n: fmtInt(prices.n), since, q1: fmtEuro(prices.q1), q3: fmtEuro(prices.q3) });
-      market = [
-        `<p class="card-muted small">${tr('card.history', { since: h.since })}</p>`,
-        line(t['card.takeovers'], fmtInt(h.takeovers)),
-        line(t['card.openings'], fmtInt(h.openings)),
-        line(t['card.closures'], fmtInt(h.closures)),
-        `<div class="eco-row eco-price"><span>${t['card.fonds']}<small>${priceHint}</small></span><b>${fmtEuro(prices.median)}</b></div>`,
-      ].join('');
-    }
-
-    const breakdown = CRITERIA.filter((k) => k.weighted)
-      .map((k) => {
-        const p = c.pct[k.key];
-        const w = view.weights[k.key] || 0;
-        const rank = p == null ? null : Math.round(p / 10);
-        return `<div class="sub">
-          <div class="sub-head"><span>${t[`crit.${k.key}`]}</span>
-            <span>${rank == null ? t['card.notPublished'] : rank} · ${tr('card.weight', { w: t[`weight.${w}`] })}</span></div>
-          <div class="sub-bar"><i style="width:${rank ?? 0}%"></i></div>
-        </div>`;
-      })
-      .join('');
+    const y = meta.years;
+    const loading = `<p class="card-muted">${t['card.loading']}</p>`;
+    const perBakery = c.bakeries ? fmtInt(c.pop / c.bakeries) : t['card.noBakery'];
 
     root.innerHTML = `
       <div class="card-head">
@@ -127,24 +161,23 @@ export function createCard(root, { onClose, meta, fonds }) {
         <b>${view.score == null ? '–' : view.score}</b>
         <span class="card-muted">${scoreText}</span>
       </div>
-      <div class="kpis">
-        ${kpi(t['card.inhabitants'], fmtInt(c.pop))}
-        ${kpi(t['card.bakeries'], c.bakeries ? fmtInt(c.bakeries) : t['card.none'])}
-        ${kpi(t['card.perBakery'], perBakery)}
-        ${kpi(t['card.income'], fmtCriterion('income', c.v.income))}
-        ${kpi(t['card.growth'], fmtCriterion('growth', c.v.growth))}
-        ${kpi(t['card.crime'], fmtCriterion('crime', c.v.crime))}
-      </div>
-      <section aria-labelledby="pyr-title"><h3 id="pyr-title">${t['card.pyramid']}</h3>${pyramid}</section>
-      <section aria-labelledby="eco-title"><h3 id="eco-title">${t['card.economy']}</h3>${economy}</section>
-      <section aria-labelledby="mkt-title"><h3 id="mkt-title">${t['card.market']}</h3>${market}</section>
-      <section aria-labelledby="sub-title"><h3 id="sub-title">${t['card.breakdown']}</h3>
-        <p class="card-muted small">${t['card.breakdown.help']}</p>${breakdown}</section>
+      ${section('demo-title', t['card.demography'], tr('card.src.census', { year: y.census }),
+        `<div class="kpis">${kpi(t['card.inhabitants'], fmtInt(c.pop), tr('card.inYear', { year: y.census }))}
+          ${kpi(t['card.growthYearly'], fmtCriterion('growth', c.v.growth), tr('card.fromTo', { from: y.growth_from, to: y.census }))}</div>`)}
+      ${section('bak-title', t['card.bakerySection'], tr('card.src.bpe', { year: y.bpe }),
+        `<div class="kpis">${kpi(t['card.bakeries'], c.bakeries ? fmtInt(c.bakeries) : t['card.none'])}
+          ${kpi(t['card.perBakery'], perBakery, c.bakeries ? t['card.perBakery.sub'] : '')}</div>`)}
+      ${section('soc-title', t['card.social'], tr('card.src.social', { income: y.income, crime: y.crime }),
+        `<div class="kpis">${kpi(t['card.income'], fmtCriterion('income', c.v.income), t['card.income.sub'])}
+          ${kpi(t['card.crime'], c.v.crime == null ? t['card.notPublished'] : `${fmtCriterion('crime', c.v.crime)} ‰`, t['card.crime.sub'])}</div>`)}
+      ${section('pyr-title', t['card.pyramid'], tr('card.src.census', { year: y.census }), page ? pyramidBlock(page) : loading)}
+      ${section('eco-title', t['card.economy'], tr('card.src.economy', { sirene: sireneMonth, bpe: y.bpe, census: y.census }), page ? economyBlock(page) : loading)}
+      ${section('mkt-title', t['card.market'], tr('card.src.market', { sirene: sireneMonth }), page ? marketBlock(c, view, page) : loading)}
+      ${section('pol-title', t['card.politics'], tr('card.src.politics', { year: y.election }), page ? politicsBlock(page.politics) : loading)}
       <div class="card-actions">
         <button type="button" class="card-page" disabled>${t['card.page']}</button>
         <button type="button" class="card-star" aria-pressed="${starred}" aria-label="${starred ? t['card.shortlistRemove'] : t['card.shortlistAdd']}">${starred ? '★' : '☆'}</button>
-      </div>
-      <p class="card-sources">${tr('card.sources', { census: meta.years.census, crime: meta.years.crime })}<a href="sources/">${t['card.sourcesLink']}</a></p>`;
+      </div>`;
 
     root.querySelector('.card-close').addEventListener('click', onClose);
     root.querySelector('.card-star').addEventListener('click', () => {
