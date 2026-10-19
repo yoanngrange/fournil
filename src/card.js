@@ -92,7 +92,7 @@ export function createCard(root, { onClose, meta }) {
         const rank = p == null ? null : Math.round(p / 10);
         return `<div class="sub">
           <div class="sub-head"><span>${t[`crit.${k.key}`]}</span>
-            <span>${rank == null ? t['card.notPublished'] : rank} · ${w ? tr('card.weight', { w: t[`weight.${w}`].toLowerCase() }) : t['card.ignored']}</span></div>
+            <span>${rank == null ? t['card.notPublished'] : rank} · ${tr('card.weight', { w: t[`weight.${w}`] })}</span></div>
           <div class="sub-bar"><i style="width:${rank ?? 0}%"></i></div>
         </div>`;
       })

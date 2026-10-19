@@ -1,5 +1,5 @@
 import t from './i18n/fr.js';
-import { BIN_COLOURS, bin, category, passesFilters, score, visibleRanges } from './lib/scoring.js';
+import { BIN_COLOURS, WEIGHTS, bin, category, passesFilters, score, visibleRanges } from './lib/scoring.js';
 import { fmtInt, tr } from './lib/format.js';
 import { readState, writeState } from './lib/url.js';
 import { createMap } from './map.js';
@@ -79,10 +79,6 @@ async function start() {
       else state.filters[key] = f;
       recompute();
     },
-    setWeight(key, w) {
-      state.weights[key] = w;
-      recompute();
-    },
     resetFilters() {
       state.filters = {};
       recompute();
@@ -116,7 +112,7 @@ async function start() {
       cat: v.cat,
       fill: v.fill,
       filteredOut: !v.ok,
-      weights: state.weights,
+      weights: WEIGHTS,
       depName: depNames[c.dep],
     };
   }
@@ -155,11 +151,11 @@ async function start() {
     tooltip.style.top = `${Math.min(Math.max(70, point.y - h / 2), wrap.height - h - 8)}px`;
   }
 
-  /** Scores and colours for every commune (weights or filters changed). */
+  /** Scores and colours for every commune (filters changed). */
   function recompute() {
     const states = [];
     for (const c of communes) {
-      const s = score(c.pct, state.weights);
+      const s = score(c.pct, WEIGHTS);
       const ok = passesFilters(c, state.filters);
       const b = ok ? bin(s) : 'out';
       const v = { score: s, cat: category(s), ok, fill: BIN_COLOURS[b] };
