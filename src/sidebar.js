@@ -24,7 +24,33 @@ function scale(key, { min, max }) {
 const roundValue = (key, v) =>
   key === 'growth' || key === 'crime' ? Math.round(v * 10) / 10 : key === 'income' ? Math.round(v / 10) * 10 : Math.round(v);
 
-export function createSidebar(root, { getState, setFilter, setWeight, resetFilters, pick }) {
+const THUMB_PX = 20;
+
+/** Value bubbles above the two handles; merged into one "lo – hi" bubble when they would overlap. */
+function placeBubbles(r, a, b, loText, hiText) {
+  const width = r.row.querySelector('.dual').clientWidth;
+  const centre = (pos) => (pos / STEPS) * (width - THUMB_PX) + THUMB_PX / 2;
+  const [bLo, bHi] = r.bubbles;
+  const put = (el, x) => {
+    const half = el.offsetWidth / 2;
+    el.style.left = `${Math.min(Math.max(x, half), width - half)}px`;
+  };
+  bLo.hidden = bHi.hidden = false;
+  bLo.textContent = loText;
+  bHi.textContent = hiText;
+  const xLo = centre(a);
+  const xHi = centre(b);
+  if (xHi - xLo < (bLo.offsetWidth + bHi.offsetWidth) / 2 + 6) {
+    bLo.textContent = loText === hiText ? loText : `${loText} – ${hiText}`;
+    bHi.hidden = true;
+    put(bLo, (xLo + xHi) / 2);
+  } else {
+    put(bLo, xLo);
+    put(bHi, xHi);
+  }
+}
+
+export function createSidebar(root, { getState, setFilter, resetFilters, pick }) {
   const rows = new Map();
   const list = root.querySelector('#criteria');
 
@@ -35,15 +61,9 @@ export function createSidebar(root, { getState, setFilter, setWeight, resetFilte
     row.innerHTML = `
       <div class="crit-head">
         <span class="crit-label" id="l-${c.key}">${label} <span class="crit-unit">${t[`crit.${c.key}.unit`]}</span></span>
-        ${
-          c.weighted
-            ? `<select class="imp" aria-label="${tr('filters.importance', { label })}">
-                ${[0, 1, 2, 3].map((w) => `<option value="${w}">${t[`weight.${w}`]}</option>`).join('')}
-              </select>`
-            : ''
-        }
       </div>
       <div class="dual">
+        <output class="bubble" aria-hidden="true"></output><output class="bubble" aria-hidden="true"></output>
         <div class="track"></div><div class="track-sel"></div>
         <input type="range" min="0" max="${STEPS}" step="1" aria-label="${tr('filters.min', { label })}">
         <input type="range" min="0" max="${STEPS}" step="1" aria-label="${tr('filters.max', { label })}">
@@ -52,8 +72,15 @@ export function createSidebar(root, { getState, setFilter, setWeight, resetFilte
     list.append(row);
 
     const [lo, hi] = row.querySelectorAll('input');
-    const select = row.querySelector('select');
-    const r = { row, lo, hi, select, sel: row.querySelector('.track-sel'), vals: row.querySelectorAll('.crit-vals span'), sc: null };
+    const r = {
+      row,
+      lo,
+      hi,
+      sel: row.querySelector('.track-sel'),
+      bubbles: row.querySelectorAll('.bubble'),
+      vals: row.querySelectorAll('.crit-vals span'),
+      sc: null,
+    };
     rows.set(c.key, r);
 
     const onSlide = (which) => () => {
@@ -71,7 +98,6 @@ export function createSidebar(root, { getState, setFilter, setWeight, resetFilte
     };
     lo.addEventListener('input', onSlide('lo'));
     hi.addEventListener('input', onSlide('hi'));
-    select?.addEventListener('change', () => setWeight(c.key, +select.value));
   }
   root.querySelector('#reset').addEventListener('click', resetFilters);
 
@@ -81,11 +107,10 @@ export function createSidebar(root, { getState, setFilter, setWeight, resetFilte
   return {
     /** ranges: visible min/max per criterion; topCommunes: [{code, name, score}] */
     update({ ranges, inView, topCommunes }) {
-      const { filters, weights } = getState();
+      const { filters } = getState();
       help.textContent = tr('filters.help', { n: inView.toLocaleString('fr-FR') });
       for (const c of CRITERIA) {
         const r = rows.get(c.key);
-        if (r.select) r.select.value = String(weights[c.key] ?? 0);
         const range = ranges[c.key];
         r.row.classList.toggle('is-empty', !range);
         r.lo.disabled = r.hi.disabled = !range;
@@ -93,6 +118,7 @@ export function createSidebar(root, { getState, setFilter, setWeight, resetFilte
           r.sc = null;
           r.vals[0].textContent = t['filters.noData'];
           r.vals[1].textContent = '';
+          r.bubbles.forEach((b) => (b.hidden = true));
           continue;
         }
         r.sc = scale(c.key, range);
@@ -107,8 +133,10 @@ export function createSidebar(root, { getState, setFilter, setWeight, resetFilte
         r.sel.style.width = `${((b - a) / STEPS) * 100}%`;
         r.lo.setAttribute('aria-valuetext', fmtCriterion(c.key, loV));
         r.hi.setAttribute('aria-valuetext', fmtCriterion(c.key, hiV));
-        r.vals[0].textContent = fmtCriterion(c.key, loV);
-        r.vals[1].textContent = fmtCriterion(c.key, hiV);
+        // Below the track: the bounds of the communes on screen. Above the handles: the chosen values.
+        r.vals[0].textContent = fmtCriterion(c.key, range.min);
+        r.vals[1].textContent = fmtCriterion(c.key, range.max);
+        placeBubbles(r, a, b, fmtCriterion(c.key, loV), fmtCriterion(c.key, hiV));
       }
 
       top.replaceChildren();

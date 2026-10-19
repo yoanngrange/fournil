@@ -77,15 +77,17 @@ button { font: inherit; }
 .crit-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 28px; }
 .crit-label { font-size: 14px; font-weight: 600; }
 .crit-unit { font-weight: 400; color: var(--muted); font-size: 12px; }
-.crit-vals { display: flex; justify-content: space-between; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--text-2); }
+.crit-vals { display: flex; justify-content: space-between; font-size: 12px; font-variant-numeric: tabular-nums; color: var(--muted); }
 .crit.is-empty .dual { opacity: 0.4; }
-.imp {
-  font: inherit; font-size: 13px; height: 32px; padding: 0 6px;
-  border: 1px solid var(--border-strong); border-radius: 7px; background: #FFFFFF; color: var(--text); cursor: pointer;
-}
 
-/* Dual range slider: two native inputs stacked on one track. */
-.dual { position: relative; height: 28px; }
+/* Dual range slider: two native inputs stacked on one track; chosen values in bubbles above. */
+.dual { position: relative; height: 28px; margin-top: 26px; }
+.bubble {
+  position: absolute; top: -24px; transform: translateX(-50%); padding: 1px 7px; border-radius: 6px;
+  background: var(--action); color: #FFFFFF; font-size: 12px; font-weight: 600; white-space: nowrap;
+  font-variant-numeric: tabular-nums; pointer-events: none;
+}
+.bubble[hidden] { display: none; }
 .dual .track, .dual .track-sel { position: absolute; top: 12px; height: 4px; border-radius: 2px; }
 .dual .track { left: 0; right: 0; background: var(--border); }
 .dual .track-sel { background: var(--action); }

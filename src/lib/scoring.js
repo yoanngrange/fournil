@@ -1,20 +1,22 @@
 // Scoring, filters and colours. Ported from design/logic-reference.js; keep behaviour identical.
 
-/** Criteria shown in the sidebar. `dir: -1` means lower is better. sell_soon waits for RNE data (M6). */
+/**
+ * Criteria shown in the sidebar. `dir: -1` means lower is better. sell_soon waits for RNE data (M6).
+ * `weight` is our scoring recipe (0–3), decided by us and explained on the sources page; users filter,
+ * they do not re-weight.
+ */
 export const CRITERIA = [
   { key: 'pop', dir: 1, weighted: false },
-  { key: 'per_bakery', dir: 1, weighted: true, defaultWeight: 3 },
-  { key: 'income', dir: 1, weighted: true, defaultWeight: 2 },
-  { key: 'growth', dir: 1, weighted: true, defaultWeight: 2 },
-  { key: 'crime', dir: -1, weighted: true, defaultWeight: 1 },
+  { key: 'per_bakery', dir: 1, weighted: true, weight: 3 },
+  { key: 'income', dir: 1, weighted: true, weight: 2 },
+  { key: 'growth', dir: 1, weighted: true, weight: 2 },
+  { key: 'crime', dir: -1, weighted: true, weight: 1 },
 ];
 
-export const DEFAULT_WEIGHTS = Object.fromEntries(
-  CRITERIA.filter((c) => c.weighted).map((c) => [c.key, c.defaultWeight]),
-);
+export const WEIGHTS = Object.fromEntries(CRITERIA.filter((c) => c.weighted).map((c) => [c.key, c.weight]));
 
 /**
- * Score 0..100 from national percentiles (0..1000, already inverted) and user weights (0..3).
+ * Score 0..100 from national percentiles (0..1000, already inverted) and weights (0..3).
  * Criteria with a null value are skipped and the remaining weights re-normalised.
  */
 export function score(pct, weights) {

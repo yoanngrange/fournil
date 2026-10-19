@@ -50,7 +50,10 @@ Mockups in `design/` (see `design/README.md`). Layout: left sidebar 380 px, map 
 - A **two-handle range slider in real units**. Its min and max are the min and max of the
   communes currently **on screen**, recomputed live on pan/zoom. The user's chosen range is kept
   in real units and clamped to the visible bounds for display.
-- An **importance** select: Ignore / Low / Medium / High (weights 0–3). Population has no weight (filter only).
+- ~~An importance select~~ **Decided (Oct 2026): no user weights.** Weights are part of our scoring recipe,
+  fixed and the same for everyone (per_bakery 3, income 2, growth 2, crime 1), explained on the sources page.
+  Users only filter. The current value of each handle is shown in a bubble above it; the min and max of the
+  communes on screen stay visible below the track.
 - "Reset filters" link.
 - Communes outside any active range are shown as "filtered out" and excluded from counts.
 - *Implemented (M2):* a handle left at the end of its slider is **open** (no bound on that side), so panning
@@ -60,7 +63,7 @@ Mockups in `design/` (see `design/README.md`). Layout: left sidebar 380 px, map 
 
 Criteria (MVP):
 
-| key | label (FR UI) | unit | better | default weight |
+| key | label (FR UI) | unit | better | weight (our recipe) |
 |---|---|---|---|---|
 | `pop` | Population | inhabitants | — (filter only) | — |
 | `per_bakery` | Habitants par boulangerie (la vôtre comprise) | inhabitants | higher | High (3) |
@@ -114,7 +117,8 @@ Kept up to date with every milestone that adds or changes a criterion.
 - **National, absolute.** For each criterion, precompute each commune's **percentile rank among all French
   communes** in the pipeline (`0..1`, ties = mid-rank). Invert for "lower is better" criteria.
 - Client computes `score = round(100 × Σ(wᵢ × pᵢ) / Σ(wᵢ))` over criteria with weight > 0 **and a value**.
-- Weights change in the browser; percentiles never change with the view.
+- Weights are fixed by us (see §3.2), not set by users; percentiles never change with the view.
+  Future presets (takeover, mobile) would be alternative recipes chosen by us, not free weights.
 - **Inhabitants per bakery, yours included** (decided Oct 2026): `per_bakery = population / (bakeries + 1)`,
   i.e. the customers each bakery would have once yours opens. This separates the two cases that the old rule
   (`population / bakeries`, and `population` when there is none) treated alike: with the same population,
