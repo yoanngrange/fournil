@@ -18,6 +18,7 @@ from pipeline.config import (
     CRITERIA,
     GROWTH_FROM,
     GROWTH_TO,
+    HISTORY_FROM,
     OUT,
     SOURCES,
 )
@@ -139,6 +140,12 @@ def commune_page(code, row, all_rows, centres, dep_names, income_ref, raw, pct, 
             "sirene_pastry": int(row["sirene_pastry"]),
             "cafes": int(row["cafes"]),
         },
+        "bakery_history": {
+            "since": int(HISTORY_FROM[:4]),
+            "takeovers": int(row["hist_takeovers"]),
+            "openings": int(row["hist_openings"]),
+            "closures": int(row["hist_closures"]),
+        },
         "competition": {
             "km": NEARBY_KM,
             "communes": int(len(near)),
@@ -154,7 +161,7 @@ def commune_page(code, row, all_rows, centres, dep_names, income_ref, raw, pct, 
 
 
 def write_all(
-    df, centres, raw, pct, display_geom, deps_gdf, adjacency, income_ref, manifest, deps, checks
+    df, centres, raw, pct, display_geom, deps_gdf, adjacency, income_ref, fonds, manifest, deps, checks
 ):
     """Replace public/data with the outputs for the given départements."""
     if OUT.exists():
@@ -163,6 +170,7 @@ def write_all(
     dep_names = deps_gdf["name"].to_dict()
 
     _write(OUT / "meta.json", meta(manifest, deps, checks))
+    _write(OUT / "fonds.json", fonds)
 
     counts = df.groupby("dep").size()
     d = deps_gdf.assign(code=deps_gdf.index, n_communes=counts.reindex(deps_gdf.index).fillna(0).astype(int))

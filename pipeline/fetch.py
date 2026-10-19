@@ -83,6 +83,9 @@ def _check_format(path, suffix: str) -> None:
         raise ValueError("truncated zip (no central directory)")
     if suffix == ".parquet" and tail != b"PAR1":
         raise ValueError("truncated parquet (no footer)")
+    if suffix == ".json":
+        with open(path, "rb") as f:
+            json.load(f)  # a cut export is not valid JSON
     if suffix == ".csv" and (not head or head.lstrip().startswith((b"<", b"{"))):
         raise ValueError(f"not a CSV file, starts with {head[:120]!r}")
 
@@ -109,7 +112,7 @@ def fetch(source_id: str, refresh: bool = False) -> dict:
 
     resolved = resolve_datagouv(spec["datagouv"]) if "datagouv" in spec else {"url": spec["url"]}
     url = resolved["url"]
-    suffix = ".parquet" if url.endswith(".parquet") else ".csv" if url.endswith(".csv") else ".zip"
+    suffix = spec.get("suffix") or (".parquet" if url.endswith(".parquet") else ".csv" if url.endswith(".csv") else ".zip")
     target = RAW / f"{source_id}{suffix}"
     RAW.mkdir(parents=True, exist_ok=True)
     tmp = target.with_suffix(target.suffix + ".part")

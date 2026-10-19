@@ -277,3 +277,6 @@ body.doc { height: auto; background: var(--sidebar); }
 .doc tr:last-child td { border-bottom: 0; }
 .doc-footer { margin-top: 28px; font-size: 13px; color: var(--muted); }
 .doc table { min-width: 640px; }
+.eco-price span { display: flex; flex-direction: column; gap: 2px; }
+.eco-price small { line-height: 1.35; }
+.eco-price b { white-space: nowrap; align-self: center; }

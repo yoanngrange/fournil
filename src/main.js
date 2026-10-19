@@ -36,10 +36,11 @@ function rows(index) {
 async function start() {
   const meta = await getJSON('meta.json');
   const dep = meta.departements[0];
-  const [index, departements, geo] = await Promise.all([
+  const [index, departements, geo, fonds] = await Promise.all([
     getJSON('communes-index.json'),
     getJSON('departements.geojson'),
     getJSON(`geo/${dep}.geojson`),
+    getJSON('fonds.json'),
   ]);
   const communes = rows(index);
   const byCode = new Map(communes.map((c) => [c.code, c]));
@@ -53,7 +54,7 @@ async function start() {
   const state = readState();
   const view = new Map(); // code -> {score, cat, ok, fill}
 
-  const card = createCard(document.getElementById('card'), { meta, onClose: () => select(null) });
+  const card = createCard(document.getElementById('card'), { meta, fonds, onClose: () => select(null) });
   const tooltip = document.getElementById('tooltip');
 
   const mapApi = createMap({
