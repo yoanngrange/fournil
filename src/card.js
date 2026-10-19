@@ -1,7 +1,7 @@
-// Pinned commune card: score, key figures, age pyramid, local economy, score breakdown.
+// Pinned commune card: score, key figures, age pyramid, local economy, bakery market, score breakdown.
 import t from './i18n/fr.js';
 import { CRITERIA, BIN_COLOURS } from './lib/scoring.js';
-import { fmtCriterion, fmtInt, fmtPct, tr } from './lib/format.js';
+import { fmtCriterion, fmtEuro, fmtInt, fmtPct, tr } from './lib/format.js';
 
 const SHORTLIST_KEY = 'fournil.shortlist';
 const cache = new Map();
@@ -31,7 +31,7 @@ async function loadCommune(code) {
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
 
-export function createCard(root, { onClose, meta }) {
+export function createCard(root, { onClose, meta, fonds }) {
   let current = null;
   const shortlist = readShortlist();
 
@@ -53,6 +53,7 @@ export function createCard(root, { onClose, meta }) {
 
     let pyramid = `<p class="card-muted">${t['card.loading']}</p>`;
     let economy = '';
+    let market = '';
     if (page) {
       const total = [...page.pyramid.m, ...page.pyramid.f].reduce((a, b) => a + (b || 0), 0) || 1;
       const max = Math.max(...page.pyramid.m, ...page.pyramid.f) || 1;
@@ -82,6 +83,21 @@ export function createCard(root, { onClose, meta }) {
         line(t['card.supermarkets'], fmtInt(a.supermarkets)),
         line(t['card.cafesRestaurants'], fmtInt(page.businesses.cafes + a.restaurants)),
         line(t['card.secondHomes'], fmtPct(page.housing.second_homes_pct)),
+      ].join('');
+
+      const h = page.bakery_history;
+      const dep = fonds.departements[c.dep];
+      const prices = dep || fonds.france;
+      const since = new Date(fonds.since).getFullYear();
+      const priceHint = dep
+        ? tr('card.fondsDep', { dep: esc(view.depName), n: fmtInt(dep.n), since, q1: fmtEuro(dep.q1), q3: fmtEuro(dep.q3) })
+        : tr('card.fondsFrance', { n: fmtInt(prices.n), since, q1: fmtEuro(prices.q1), q3: fmtEuro(prices.q3) });
+      market = [
+        `<p class="card-muted small">${tr('card.history', { since: h.since })}</p>`,
+        line(t['card.takeovers'], fmtInt(h.takeovers)),
+        line(t['card.openings'], fmtInt(h.openings)),
+        line(t['card.closures'], fmtInt(h.closures)),
+        `<div class="eco-row eco-price"><span>${t['card.fonds']}<small>${priceHint}</small></span><b>${fmtEuro(prices.median)}</b></div>`,
       ].join('');
     }
 
@@ -121,6 +137,7 @@ export function createCard(root, { onClose, meta }) {
       </div>
       <section aria-labelledby="pyr-title"><h3 id="pyr-title">${t['card.pyramid']}</h3>${pyramid}</section>
       <section aria-labelledby="eco-title"><h3 id="eco-title">${t['card.economy']}</h3>${economy}</section>
+      <section aria-labelledby="mkt-title"><h3 id="mkt-title">${t['card.market']}</h3>${market}</section>
       <section aria-labelledby="sub-title"><h3 id="sub-title">${t['card.breakdown']}</h3>
         <p class="card-muted small">${t['card.breakdown.help']}</p>${breakdown}</section>
       <div class="card-actions">

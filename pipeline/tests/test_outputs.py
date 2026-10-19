@@ -141,3 +141,23 @@ def test_clisson_snapshot(meta):
         SNAPSHOT.write_text(json.dumps(current, indent=1, ensure_ascii=False))
         pytest.skip("snapshot written")
     assert current == json.loads(SNAPSHOT.read_text())
+
+
+def test_bakery_history_counts(index):
+    for code in index["code"]:
+        h = load(f"commune/{code}.json")["bakery_history"]
+        assert h["since"] == 2016
+        assert all(isinstance(h[k], int) and h[k] >= 0 for k in ("takeovers", "openings", "closures"))
+    # Casson (44027): the 2020 takeover of its only bakery.
+    if (OUT / "commune" / "44027.json").exists():
+        assert load("commune/44027.json")["bakery_history"]["takeovers"] >= 1
+
+
+def test_business_prices_are_aggregates_only(meta):
+    fonds = load("fonds.json")
+    assert set(fonds) == {"since", "min_sales", "france", "departements"}
+    assert fonds["france"]["n"] > 1000
+    for stats in [fonds["france"], *fonds["departements"].values()]:
+        assert set(stats) == {"n", "median", "q1", "q3"}
+        assert stats["n"] >= fonds["min_sales"], "a price shown from too few sales could identify a sale"
+        assert 5_000 <= stats["q1"] <= stats["median"] <= stats["q3"] <= 3_000_000

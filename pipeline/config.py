@@ -113,6 +113,19 @@ SOURCES = {
         "licence": "Licence Ouverte 2.0",
         "page": "https://www.data.gouv.fr/datasets/bases-statistiques-communale-departementale-et-regionale-de-la-delinquance-enregistree-par-la-police-et-la-gendarmerie-nationales",
     },
+    "bodacc": {
+        "name": "BODACC — ventes de fonds de boulangerie",
+        "producer": "DILA",
+        "vintage": "annonces depuis 2008",
+        "url": (
+            "https://bodacc-datadila.opendatasoft.com/api/explore/v2.1/catalog/datasets/annonces-commerciales/"
+            "exports/json?where=familleavis%3D%27vente%27%20and%20search(listeetablissements%2C%20%22boulangerie%22)"
+            "&select=dateparution%2Ctypeavis%2Cnumerodepartement%2Ccp%2Clisteetablissements%2Cacte"
+        ),
+        "suffix": ".json",
+        "licence": "Licence Ouverte 2.0",
+        "page": "https://bodacc-datadila.opendatasoft.com/explore/dataset/annonces-commerciales/",
+    },
     "sirene": {
         "name": "Base Sirene des établissements",
         "producer": "Insee",
@@ -148,6 +161,15 @@ NAF_BAKERY = "10.71C"
 NAF_PASTRY = "10.71D"  # BPE "boulangerie-pâtisserie" is compared with SIRENE 10.71C + 10.71D
 NAF_BREAD_RETAIL = "47.24Z"
 NAF_CAFES = "56.30Z"
+
+# --- Bakery history (SIRENE): openings, closures and takeovers of 10.71C establishments ---
+HISTORY_FROM = "2016-01-01"
+TAKEOVER_WINDOW_DAYS = 180  # a closure and an opening by another company this close = a takeover
+
+# --- Price of a bakery business (BODACC sale notices) ---
+FONDS_YEARS = 5  # sales published in the last N years
+FONDS_MIN_SALES = 20  # below this, no département figure is shown (national only)
+FONDS_PRICE_RANGE = (5_000, 3_000_000)  # outside: bundled sales or typing errors
 
 # --- Crime (SSMSI): sum of these indicators per 1,000 inhabitants ---
 # SSMSI publishes 0 and counts ≥ 5, and withholds counts of 1 to 4. A withheld indicator is counted

@@ -14,7 +14,7 @@ import zipfile
 
 import pandas as pd
 
-from pipeline import build_geo, build_stats, cog, export, fetch, score
+from pipeline import build_geo, build_market, build_stats, cog, export, fetch, score
 
 MAX_POP_GAP = 0.005  # DATA.md §5: population within 0.5 % of the official total
 MAX_BAKERY_GAP = 0.15  # DATA.md §5: BPE vs SIRENE bakery count, national
@@ -76,6 +76,9 @@ def main(argv=None):
     if unknown:
         raise SystemExit(f"Unknown département(s): {sorted(unknown)}")
     df, refs = build_stats.build(communes)
+    print("  bakery history (SIRENE) and business prices (BODACC) …", flush=True)
+    df = df.join(build_market.bakery_history(set(df.index)))
+    fonds = build_market.fonds_prices(set(communes.dep))
 
     print("3/5 scores")
     raw = score.criteria(df)
@@ -91,7 +94,9 @@ def main(argv=None):
 
     print("5/5 checks and export")
     checks = quality_checks(df, deps)
-    export.write_all(df, centres, raw, pct, display, deps_gdf, adjacency, refs["income"], manifest, deps, checks)
+    export.write_all(
+        df, centres, raw, pct, display, deps_gdf, adjacency, refs["income"], fonds, manifest, deps, checks
+    )
     print(f"done in {time.time() - t0:.0f}s: {len(targets)} communes in {len(deps)} département(s) -> public/data/")
     print(f"  checks: {checks}")
 
