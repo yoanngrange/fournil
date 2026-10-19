@@ -8,7 +8,8 @@ from pipeline.config import CRITERIA, LOWER_IS_BETTER, NO_BAKERY_BOOST
 
 def criteria(df: pd.DataFrame) -> pd.DataFrame:
     """Raw value of each criterion, in the units shown to the user (NaN = not available)."""
-    per_bakery = df["pop"] / (df["bakeries"] + 1)  # inhabitants per bakery once yours opens
+    # Inhabitants per existing bakery; none when the commune has no bakery (shown as "aucune").
+    per_bakery = (df["pop"] / df["bakeries"]).where(df["bakeries"] > 0)
     raw = pd.DataFrame(
         {
             "per_bakery": per_bakery,
@@ -32,11 +33,15 @@ def percentile(values: pd.Series) -> pd.Series:
     return (1000 * p).round().reindex(values.index)
 
 
-def percentiles(raw: pd.DataFrame, bakeries: pd.Series) -> pd.DataFrame:
-    """National percentile per criterion, already inverted where lower is better."""
+def percentiles(raw: pd.DataFrame, df: pd.DataFrame) -> pd.DataFrame:
+    """National percentile per criterion, already inverted where lower is better.
+
+    A commune without a bakery has no "inhabitants per bakery"; it is ranked as if it had
+    NO_BAKERY_BOOST × its population per bakery (no competition at all is an opportunity).
+    """
     ranked = raw.copy()
-    # Communes with no bakery rank as if they had NO_BAKERY_BOOST × their inhabitants per bakery.
-    ranked["per_bakery"] = raw["per_bakery"] * np.where(bakeries == 0, NO_BAKERY_BOOST, 1.0)
+    no_bakery = (df["bakeries"] == 0) & (df["pop"] > 0)
+    ranked.loc[no_bakery, "per_bakery"] = df.loc[no_bakery, "pop"] * NO_BAKERY_BOOST
     out = pd.DataFrame({c: percentile(ranked[c]) for c in CRITERIA}, index=raw.index)
     for c in LOWER_IS_BETTER:
         out[c] = 1000 - out[c]

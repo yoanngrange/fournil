@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 
 from pipeline import build_geo
+from pipeline.build_local import SIZE_GROUPS
 from pipeline.build_stats import AGE_BANDS
 from pipeline.config import (
     BPE_CODES,
@@ -70,7 +71,7 @@ def meta(manifest: dict, deps: list[str], checks: dict) -> dict:
         "built_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "departements": deps,
         "percentiles": "France métropolitaine et Corse",
-        "years": {"census": GROWTH_TO, "growth_from": GROWTH_FROM, "crime": CRIME_YEAR},
+        "years": {"census": GROWTH_TO, "growth_from": GROWTH_FROM, "crime": CRIME_YEAR, "income": 2023, "bpe": 2025, "election": 2026},
         "checks": checks,
         "sources": sources,
     }
@@ -92,7 +93,7 @@ def index(df: pd.DataFrame, centres: pd.DataFrame, raw: pd.DataFrame, pct: pd.Da
     }
 
 
-def commune_page(code, row, all_rows, centres, dep_names, income_ref, raw, pct, neighbours) -> dict:
+def commune_page(code, row, all_rows, centres, dep_names, income_ref, raw, pct, neighbours, employers, politics) -> dict:
     hist = [[int(c[4:]), int(row[c])] for c in all_rows.columns if c.startswith("pop_") and pd.notna(row[c])]
     bands = [label for _, label in AGE_BANDS]
     here = centres.loc[[code]]
@@ -139,7 +140,10 @@ def commune_page(code, row, all_rows, centres, dep_names, income_ref, raw, pct, 
             "sirene_bakeries": int(row["sirene_bakeries"]),
             "sirene_pastry": int(row["sirene_pastry"]),
             "cafes": int(row["cafes"]),
+            "by_size": {k: int(row[f"size_{k}"]) for k in SIZE_GROUPS},
+            "main_employers": employers.get(code, []),
         },
+        "politics": politics.get(code),
         "bakery_history": {
             "since": int(HISTORY_FROM[:4]),
             "takeovers": int(row["hist_takeovers"]),
@@ -161,7 +165,8 @@ def commune_page(code, row, all_rows, centres, dep_names, income_ref, raw, pct, 
 
 
 def write_all(
-    df, centres, raw, pct, display_geom, deps_gdf, adjacency, income_ref, fonds, manifest, deps, checks
+    df, centres, raw, pct, display_geom, deps_gdf, adjacency, income_ref, fonds, employers, politics, manifest, deps,
+    checks,
 ):
     """Replace public/data with the outputs for the given départements."""
     if OUT.exists():
@@ -188,5 +193,7 @@ def write_all(
         _write(OUT / "adj" / f"{dep}.json", {c: adjacency[c] for c in codes})
 
     for code, row in scope.iterrows():
-        page = commune_page(code, row, df, centres, dep_names, income_ref, raw, pct, adjacency.get(code, []))
+        page = commune_page(
+            code, row, df, centres, dep_names, income_ref, raw, pct, adjacency.get(code, []), employers, politics
+        )
         _write(OUT / "commune" / f"{code}.json", page)

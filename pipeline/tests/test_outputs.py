@@ -70,8 +70,11 @@ def test_value_ranges(index):
 def test_missing_values_stay_missing(index):
     """Missing data is null, never 0, and its percentile is null too."""
     for c in CRITERIA:
-        for v, p in zip(index["v"][c], index["pct"][c]):
-            assert (v is None) == (p is None)
+        for v, p, b, pop in zip(index["v"][c], index["pct"][c], index["bakeries"], index["pop"]):
+            if c == "per_bakery" and b == 0 and pop > 0:
+                assert v is None and p is not None  # no bakery: no ratio, but ranked (boost)
+            else:
+                assert (v is None) == (p is None)
 
 
 def test_no_bakery_ranks_above_same_size_with_one(index):
@@ -161,3 +164,18 @@ def test_business_prices_are_aggregates_only(meta):
         assert set(stats) == {"n", "median", "q1", "q3"}
         assert stats["n"] >= fonds["min_sales"], "a price shown from too few sales could identify a sale"
         assert 5_000 <= stats["q1"] <= stats["median"] <= stats["q3"] <= 3_000_000
+
+
+def test_local_context(index):
+    for code in index["code"]:
+        page = load(f"commune/{code}.json")
+        sizes = page["businesses"]["by_size"]
+        assert sum(sizes.values()) == page["businesses"]["total"]
+        assert len(page["businesses"]["main_employers"]) <= 3
+        pol = page["politics"]
+        if pol:
+            assert set(pol) == {"mayor", "list", "nuance", "rounds"}  # name only: no birth date, no occupation
+            for r in pol["rounds"]:
+                assert r["turnout"] is None or 0 < r["turnout"] <= 100
+    clisson = load("commune/44043.json")
+    assert clisson["politics"]["mayor"] and clisson["politics"]["rounds"]

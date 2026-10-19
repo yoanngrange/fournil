@@ -55,7 +55,10 @@ def code_mapping() -> dict[str, str]:
             new = mapping[new]
         mapping[old] = new
     mapping.update(zip(arm.COM, arm.COMPARENT))
-    return mapping
+    # A code that is a commune in the frozen vintage is never remapped: communes merged then restored
+    # (e.g. Montbert, Vay) appear in the history as old codes but are valid today.
+    current = set(cog[cog.TYPECOM == "COM"].COM)
+    return {old: new for old, new in mapping.items() if old not in current}
 
 
 def align(df: pd.DataFrame, valid_codes: set[str], source: str, additive: bool) -> pd.DataFrame:
