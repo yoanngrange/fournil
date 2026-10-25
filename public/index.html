@@ -47,7 +47,7 @@
 
       <div class="topbar">
         <nav class="pill breadcrumb" data-i18n-aria-label="map.breadcrumb">
-          <span data-i18n="map.france"></span><span class="sep" aria-hidden="true">›</span><b id="dep-name"></b>
+          <button type="button" class="crumb" id="crumb-france" data-i18n="map.france"></button><span class="sep" aria-hidden="true">›</span><b id="dep-name"></b>
         </nav>
         <div class="pill counts" id="counts" aria-live="polite"></div>
         <div class="grow"></div>
@@ -68,10 +68,13 @@
       </div>
 
       <div class="legend pill" role="group" data-i18n-aria-label="legend.title">
-        <div><span class="swatch" style="background:#4D9221"></span><span data-i18n-html="legend.go"></span></div>
-        <div><span class="swatch swatch-light" style="background:#ECEAE1"></span><span data-i18n-html="legend.maybe"></span></div>
-        <div><span class="swatch is-hatched" style="background:#DE77AE"></span><span data-i18n-html="legend.avoid"></span></div>
-        <div><span class="swatch" style="background:#D9D2C5"></span><span data-i18n="legend.out"></span></div>
+        <div id="legend-deps"></div>
+        <div id="legend-communes" hidden>
+          <div><span class="swatch" style="background:#4D9221"></span><span data-i18n-html="legend.go"></span></div>
+          <div><span class="swatch swatch-light" style="background:#ECEAE1"></span><span data-i18n-html="legend.maybe"></span></div>
+          <div><span class="swatch is-hatched" style="background:#DE77AE"></span><span data-i18n-html="legend.avoid"></span></div>
+          <div><span class="swatch" style="background:#D9D2C5"></span><span data-i18n="legend.out"></span></div>
+        </div>
       </div>
 
       <div class="tooltip" id="tooltip" role="tooltip" hidden></div>

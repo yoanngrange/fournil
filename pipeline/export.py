@@ -47,7 +47,7 @@ def _write(path, obj):
 
 
 def _round(s: pd.Series, digits: int) -> list:
-    return [None if pd.isna(v) else (int(round(v)) if digits == 0 else round(float(v), digits)) for v in s]
+    return [None if pd.isna(v) else (int(round(v, digits)) if digits <= 0 else round(float(v), digits)) for v in s]
 
 
 def meta(manifest: dict, deps: list[str], checks: dict) -> dict:
@@ -79,17 +79,19 @@ def meta(manifest: dict, deps: list[str], checks: dict) -> dict:
 
 def index(df: pd.DataFrame, centres: pd.DataFrame, raw: pd.DataFrame, pct: pd.DataFrame) -> dict:
     """communes-index.json: one entry per commune, columnar arrays with short keys."""
-    digits = {"per_bakery": 0, "income": 0, "growth": 2, "crime": 1, "sell_soon": 0}
+    # Kept lean (DATA.md §4): ~100 m positions, income to the nearest 10 €, criteria without any data omitted.
+    digits = {"per_bakery": 0, "income": -1, "growth": 2, "crime": 1, "sell_soon": 0}
+    present = [c for c in CRITERIA if raw[c].notna().any()]
     return {
         "code": list(df.index),
         "name": list(df["name"]),
         "dep": list(df["dep"]),
-        "lat": _round(centres.lat, 4),
-        "lon": _round(centres.lon, 4),
+        "lat": _round(centres.lat, 3),
+        "lon": _round(centres.lon, 3),
         "pop": _round(df["pop"], 0),
         "bakeries": _round(df["bakeries"], 0),
-        "v": {c: _round(raw[c], digits[c]) for c in CRITERIA},
-        "pct": {c: _round(pct[c], 0) for c in CRITERIA},
+        "v": {c: _round(raw[c], digits[c]) for c in present},
+        "pct": {c: _round(pct[c], 0) for c in present},
     }
 
 

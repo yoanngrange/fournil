@@ -47,7 +47,7 @@ def test_index_one_row_per_commune(index, meta):
     n = len(codes)
     for key in ["name", "dep", "lat", "lon", "pop", "bakeries"]:
         assert len(index[key]) == n
-    for c in CRITERIA:
+    for c in index["v"]:
         assert len(index["v"][c]) == n and len(index["pct"][c]) == n
 
 
@@ -60,7 +60,7 @@ def test_value_ranges(index):
     assert all(p >= 0 for p in index["pop"])
     assert all(b >= 0 for b in index["bakeries"])
     assert all(41 < lat < 52 and -6 < lon < 10 for lat, lon in zip(index["lat"], index["lon"]))
-    for c in CRITERIA:
+    for c in index["pct"]:
         assert all(p is None or 0 <= p <= 1000 for p in index["pct"][c])
     assert all(v is None or 5_000 < v < 80_000 for v in index["v"]["income"])
     assert all(v is None or -20 < v < 25 for v in index["v"]["growth"])
@@ -69,7 +69,7 @@ def test_value_ranges(index):
 
 def test_missing_values_stay_missing(index):
     """Missing data is null, never 0, and its percentile is null too."""
-    for c in CRITERIA:
+    for c in index["v"]:
         for v, p, b, pop in zip(index["v"][c], index["pct"][c], index["bakeries"], index["pop"]):
             if c == "per_bakery" and b == 0 and pop > 0:
                 assert v is None and p is not None  # no bakery: no ratio, but ranked (boost)
@@ -102,7 +102,7 @@ def test_geometry_and_adjacency(index, meta):
                 if nb in adj:
                     assert code in adj[nb], f"adjacency not symmetric: {code} / {nb}"
         islands = [c for c, nbs in adj.items() if not nbs]
-        assert len(islands) <= 3, f"communes without neighbours: {islands}"
+        assert len(islands) <= 8, f"communes without neighbours: {islands}"  # islands (Morbihan has 5)
 
 
 def test_departements_file(meta):

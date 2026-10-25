@@ -47,6 +47,7 @@ export default {
   'crit.crime.unit': 'faits pour 1 000 hab.',
 
   'top.title': 'Meilleures communes à l’écran',
+  'top.depTitle': 'Départements avec le plus de communes favorables',
   'top.empty': 'Aucune commune ne passe les filtres à l’écran.',
 
   'cat.go': 'Favorable',
@@ -56,12 +57,15 @@ export default {
   'cat.out': 'Hors filtres',
 
   'legend.title': 'Légende',
+  'legend.depTitle': 'Communes favorables par département',
   'legend.go': '<b>Favorable</b> · 60 et plus',
   'legend.maybe': '<b>À étudier</b> · 40 à 59',
   'legend.avoid': '<b>Défavorable</b> · moins de 40, hachuré',
   'legend.out': 'Hors filtres ou non notée',
 
   'tip.score': 'Note {s} · {cat}',
+  'tip.depGo': '{n} communes favorables',
+  'tip.depTotal': 'sur {n} communes · cliquez pour zoomer',
   'tip.pop': '{n} habitants · cliquez pour le détail',
 
   'card.label': 'Détail de {name}',
@@ -190,7 +194,7 @@ export default {
   ],
   'sources.bias.title': 'Biais et limites',
   'sources.bias': [
-    '<b>Secret statistique.</b> Pour les petites communes, l’Insee et le ministère ne publient pas toujours les chiffres : en Loire-Atlantique, la délinquance manque pour {crimeMissing} des communes. La note repose alors sur moins de critères.',
+    '<b>Secret statistique.</b> Pour les petites communes, l’Insee et le ministère ne publient pas toujours les chiffres : la délinquance manque pour {crimeMissing} des communes de France. La note repose alors sur moins de critères.',
     '<b>Délinquance enregistrée là où elle est déclarée.</b> Les communes avec une gendarmerie, des commerces, une gare ou du tourisme concentrent les plaintes de tout un secteur et paraissent plus exposées que leurs voisines.',
     '<b>Villages sans fait publié.</b> Un village sans aucun fait recensé obtient le meilleur rang en délinquance ; sur une petite population, une seule année calme ou agitée change beaucoup ce rang.',
     '<b>Population de {census}.</b> Le recensement a quelques années de retard : une commune qui grandit vite a aujourd’hui plus d’habitants que ce qui est affiché.',

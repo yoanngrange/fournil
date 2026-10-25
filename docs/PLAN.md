@@ -41,6 +41,10 @@ Start every milestone on Loire-Atlantique (44), then generalise.
 - Search with autocomplete.
 - **Done when:** national view loads < 2 s on throttled 4G; scores identical to M2 for dep 44 after
   switching to national percentiles (colours may differ, that is expected and correct).
+- *Done (Oct 2026):* `--all` builds 34,746 communes in ~4 min (223 MB in `public/data/`). National view colours
+  départements by Go communes (quintiles), top départements in the sidebar, click to zoom; commune polygons load
+  per département. `communes-index.json` is 865 kB gzipped (target was 400 kB): fine on 4G (< 1 s), further
+  savings possible with delta encoding. Search was already done in M2.
 
 ## M4 — Commune page
 - Route `/commune/{code}` rendered from `commune/{code}.json`; layout as `design/Commune.dc.html`.
