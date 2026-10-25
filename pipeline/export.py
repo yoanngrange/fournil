@@ -162,7 +162,11 @@ def commune_page(code, row, all_rows, centres, dep_names, income_ref, raw, pct, 
             {"code": c, "name": r["name"], "km": round(r.km, 1), "pop": int(r["pop"]), "bakeries": int(r.bakeries)}
             for c, r in near.head(NEARBY_ROWS).iterrows()
         ],
-        "neighbours": neighbours,
+        "neighbours": [
+            {"code": n, "name": all_rows.at[n, "name"], "bakeries": int(all_rows.at[n, "bakeries"])}
+            for n in neighbours
+            if n in all_rows.index
+        ],
     }
 
 

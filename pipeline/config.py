@@ -9,6 +9,9 @@ ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "pipeline" / "raw"
 OUT = ROOT / "public" / "data"
 
+# Public address of the site (canonical URLs, sitemap).
+SITE_URL = "https://yoanngrange.github.io/fournil/"
+
 # One COG (Code officiel géographique) vintage per run. Every commune is keyed on its code in this vintage.
 COG_YEAR = 2026
 
@@ -232,7 +235,9 @@ CRIME_INDICATORS = [
 
 # --- Scoring (docs/SPEC.md §4) ---
 GROWTH_FROM, GROWTH_TO = 2017, 2023  # census years compared for the yearly growth rate
-NO_BAKERY_BOOST = 3  # a commune without a bakery ranks as if it had this × its population per bakery
+NO_BAKERY_BOOST = 3  # a commune without a bakery ranks as if it had this × its population per bakery…
+NO_BAKERY_BOOST_FROM = 500  # …but not below this population (ranked as if it had one bakery: too small to sustain one)
+NO_BAKERY_BOOST_FULL = 1000  # full boost from this population, linear in between
 CRITERIA = ["per_bakery", "income", "growth", "crime", "sell_soon"]
 LOWER_IS_BETTER = {"crime"}
 

@@ -4,7 +4,7 @@
  "criteria": {
   "per_bakery": {
    "v": 931.5,
-   "pct": 536.0
+   "pct": 702.0
   },
   "income": {
    "v": 28020.0,
@@ -82,11 +82,35 @@
   "stations": 1
  },
  "neighbours": [
-  "44063",
-  "44064",
-  "44108",
-  "44165",
-  "49301",
-  "85076"
+  {
+   "code": "44063",
+   "name": "Gétigné",
+   "bakeries": 4
+  },
+  {
+   "code": "44064",
+   "name": "Gorges",
+   "bakeries": 2
+  },
+  {
+   "code": "44108",
+   "name": "Mouzillon",
+   "bakeries": 1
+  },
+  {
+   "code": "44165",
+   "name": "Saint-Hilaire-de-Clisson",
+   "bakeries": 2
+  },
+  {
+   "code": "49301",
+   "name": "Sèvremoine",
+   "bakeries": 18
+  },
+  {
+   "code": "85076",
+   "name": "Cugand-la-Bernardière",
+   "bakeries": 4
+  }
  ]
 }

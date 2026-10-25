@@ -2,6 +2,7 @@ import t from './i18n/fr.js';
 import { BIN_COLOURS, WEIGHTS, bin, category, passesFilters, score, visibleRanges } from './lib/scoring.js';
 import { fmtInt, tr } from './lib/format.js';
 import { readState, writeState } from './lib/url.js';
+import { depPath, siteRoot } from './lib/slug.js';
 import { DEP_SCALE, createMap } from './map.js';
 import { createSidebar } from './sidebar.js';
 import { createCard } from './card.js';
@@ -37,11 +38,10 @@ function rows(index) {
 const FRANCE = [[-5.3, 41.3], [9.7, 51.2]];
 
 async function start() {
-  const [meta, index, departements, fonds] = await Promise.all([
+  const [meta, index, departements] = await Promise.all([
     getJSON('meta.json'),
     getJSON('communes-index.json'),
     getJSON('departements.geojson'),
-    getJSON('fonds.json'),
   ]);
   const communes = rows(index);
   const byCode = new Map(communes.map((c) => [c.code, c]));
@@ -54,10 +54,11 @@ async function start() {
   }
 
   const state = readState();
+  const sharedPosition = location.hash.includes('carte='); // read before MapLibre writes its own
   const view = new Map(); // code -> {score, cat, ok, fill}
   const depView = new Map(); // dep -> {go, n, q}
 
-  const card = createCard(document.getElementById('card'), { meta, fonds, onClose: () => select(null) });
+  const card = createCard(document.getElementById('card'), { meta, onClose: () => select(null) });
   const tooltip = document.getElementById('tooltip');
 
   const mapApi = createMap({
@@ -271,6 +272,10 @@ async function start() {
     depEl.textContent = centreDep ? depNames[centreDep] : '';
     depEl.previousElementSibling.hidden = !centreDep;
 
+    // The address follows the view: /<département>/ when zoomed in, the site root when zoomed out.
+    const path = siteRoot() + (centreDep ? depPath(depNames[centreDep]) : '');
+    if (location.pathname !== path) history.replaceState(null, '', path + location.search + location.hash);
+
     let topTitle;
     let topItems;
     if (national) {
@@ -288,8 +293,11 @@ async function start() {
   }
 
   await mapApi.whenReady;
+  // Département page (/loire-atlantique/): open on it unless the address already holds a map position.
+  const preset = document.querySelector('meta[name="fournil-dep"]')?.content;
+  if (preset && !sharedPosition) mapApi.fitDep(preset);
   recompute();
-  if (state.sel) select(state.sel, { fly: !location.hash });
+  if (state.sel) select(state.sel, { fly: !sharedPosition });
   status.textContent = '';
 }
 

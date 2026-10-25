@@ -53,6 +53,10 @@ Start every milestone on Loire-Atlantique (44), then generalise.
   output deployed as the Pages artifact and never committed (SPEC §3.4).
 - **Done when:** every section works for Clisson (44043), a tiny village with missing Filosofi data,
   and Paris.
+- *Done (Oct 2026):* commune page at `/<département>/<commune>-<code>/` (SPEC §3.6) rendered by `src/commune.js`
+  from `commune/<code>.json`, with a generated summary sentence, locator map, score breakdown, population since
+  1968, age pyramid, competition within 10 km and takeovers, local economy, income and housing, safety and
+  services, politics. 34,842 static pages + sitemap generated in ~15 s. DVF prices still to add.
 
 ## M5 — Delivery mode
 - Switch, bakehouse pin, Distance / Contiguous modes (algorithm: `design/logic-reference.js`).

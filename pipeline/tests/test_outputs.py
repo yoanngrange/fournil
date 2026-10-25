@@ -80,7 +80,7 @@ def test_missing_values_stay_missing(index):
 def test_no_bakery_ranks_above_same_size_with_one(index):
     """SPEC §4: without a bakery, a commune ranks above one of similar size that has one."""
     rows = list(zip(index["pop"], index["bakeries"], index["pct"]["per_bakery"]))
-    none = [(pop, p) for pop, b, p in rows if b == 0 and pop > 1000]
+    none = [(pop, p) for pop, b, p in rows if b == 0 and pop >= 1000]  # full boost from 1,000 inhabitants
     one = [(pop, p) for pop, b, p in rows if b == 1]
     for pop, p in none:
         similar = [q for pop1, q in one if abs(pop1 - pop) / pop < 0.1]

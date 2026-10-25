@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 
-from pipeline.config import CRITERIA, LOWER_IS_BETTER, NO_BAKERY_BOOST
+from pipeline.config import CRITERIA, LOWER_IS_BETTER, NO_BAKERY_BOOST, NO_BAKERY_BOOST_FROM, NO_BAKERY_BOOST_FULL
 
 
 def criteria(df: pd.DataFrame) -> pd.DataFrame:
@@ -33,15 +33,23 @@ def percentile(values: pd.Series) -> pd.Series:
     return (1000 * p).round().reindex(values.index)
 
 
+def no_bakery_factor(pop: pd.Series) -> pd.Series:
+    """Boost for a commune without a bakery: 1 below NO_BAKERY_BOOST_FROM inhabitants (too small to
+    sustain a bakery, so ranked as if it had one), NO_BAKERY_BOOST from NO_BAKERY_BOOST_FULL, linear between."""
+    share = ((pop - NO_BAKERY_BOOST_FROM) / (NO_BAKERY_BOOST_FULL - NO_BAKERY_BOOST_FROM)).clip(0, 1)
+    return 1 + (NO_BAKERY_BOOST - 1) * share
+
+
 def percentiles(raw: pd.DataFrame, df: pd.DataFrame) -> pd.DataFrame:
     """National percentile per criterion, already inverted where lower is better.
 
-    A commune without a bakery has no "inhabitants per bakery"; it is ranked as if it had
-    NO_BAKERY_BOOST × its population per bakery (no competition at all is an opportunity).
+    A commune without a bakery has no "inhabitants per bakery"; it is ranked on its population times
+    no_bakery_factor (no competition is an opportunity, but only for a commune big enough).
     """
     ranked = raw.copy()
     no_bakery = (df["bakeries"] == 0) & (df["pop"] > 0)
-    ranked.loc[no_bakery, "per_bakery"] = df.loc[no_bakery, "pop"] * NO_BAKERY_BOOST
+    pop = df.loc[no_bakery, "pop"]
+    ranked.loc[no_bakery, "per_bakery"] = pop * no_bakery_factor(pop)
     out = pd.DataFrame({c: percentile(ranked[c]) for c in CRITERIA}, index=raw.index)
     for c in LOWER_IS_BETTER:
         out[c] = 1000 - out[c]
