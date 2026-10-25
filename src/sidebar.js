@@ -1,6 +1,6 @@
-// Sidebar: one row per criterion (dual range slider in real units + importance), reset, top list.
+// Sidebar: one row per criterion (dual range slider in real units), reset, top list.
 import t from './i18n/fr.js';
-import { CRITERIA, BIN_COLOURS, bin } from './lib/scoring.js';
+import { CRITERIA } from './lib/scoring.js';
 import { fmtCriterion, tr } from './lib/format.js';
 
 const STEPS = 1000; // slider positions; values are mapped through a linear or log scale
@@ -103,10 +103,11 @@ export function createSidebar(root, { getState, setFilter, resetFilters, pick })
 
   const help = root.querySelector('#filters-help');
   const top = root.querySelector('#top-list');
+  const topTitleEl = root.querySelector('#top-title');
 
   return {
-    /** ranges: visible min/max per criterion; topCommunes: [{code, name, score}] */
-    update({ ranges, inView, topCommunes }) {
+    /** ranges: visible min/max per criterion; topItems: [{id, name, value, colour}] (communes or départements) */
+    update({ ranges, inView, topTitle, topItems }) {
       const { filters } = getState();
       help.textContent = tr('filters.help', { n: inView.toLocaleString('fr-FR') });
       for (const c of CRITERIA) {
@@ -139,22 +140,23 @@ export function createSidebar(root, { getState, setFilter, resetFilters, pick })
         placeBubbles(r, a, b, fmtCriterion(c.key, loV), fmtCriterion(c.key, hiV));
       }
 
+      topTitleEl.textContent = topTitle;
       top.replaceChildren();
-      if (!topCommunes.length) {
+      if (!topItems.length) {
         const li = document.createElement('li');
         li.className = 'top-empty';
         li.textContent = t['top.empty'];
         top.append(li);
       }
-      topCommunes.forEach((c) => {
+      topItems.forEach((item) => {
         const li = document.createElement('li');
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'top-item';
-        btn.innerHTML = `<span class="swatch" style="background:${BIN_COLOURS[bin(c.score)]}"></span>
-          <span class="top-name"></span><span class="top-score">${c.score}</span>`;
-        btn.querySelector('.top-name').textContent = c.name;
-        btn.addEventListener('click', () => pick(c.code));
+        btn.innerHTML = `<span class="swatch" style="background:${item.colour}"></span>
+          <span class="top-name"></span><span class="top-score">${item.value}</span>`;
+        btn.querySelector('.top-name').textContent = item.name;
+        btn.addEventListener('click', () => pick(item.id));
         li.append(btn);
         top.append(li);
       });

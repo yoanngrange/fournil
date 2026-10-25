@@ -112,7 +112,10 @@ def _round(path) -> dict:
                 }
             )
         lists.sort(key=lambda x: -(x["pct"] or 0))
-        out[r["Code commune"]] = {"turnout": _pct(r["% Votants"]), "lists": lists}
+        turnout = _pct(r["% Votants"])
+        if turnout is not None and not 0 < turnout <= 100:
+            turnout = None  # a few rows of the official file are inconsistent (0 %, 101 %)
+        out[r["Code commune"]] = {"turnout": turnout, "lists": lists}
     return out
 
 

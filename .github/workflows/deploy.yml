@@ -16,9 +16,6 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
-env:
-  DEPARTEMENTS: "44" # prototype scope; `--all` from milestone M3
-
 jobs:
   build:
     runs-on: ubuntu-24.04
@@ -40,7 +37,7 @@ jobs:
           key: raw-${{ steps.month.outputs.value }}-${{ hashFiles('pipeline/config.py') }}
 
       - name: Build data
-        run: uv run python -m pipeline.run --dep $DEPARTEMENTS
+        run: uv run python -m pipeline.run --all
 
       - name: Test data
         run: uv run pytest -q
