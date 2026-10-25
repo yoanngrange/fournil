@@ -6,4 +6,5 @@ cd "$(dirname "$0")/.."
 rm -rf _site
 cp -R public _site
 cp -R src _site/src
+uv run python -m pipeline.pages _site
 echo "Site assembled in _site/ ($(find _site -type f | wc -l | tr -d ' ') files)"

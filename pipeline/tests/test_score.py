@@ -32,3 +32,8 @@ def test_crime_is_inverted_and_no_bakery_is_boosted():
     assert pct.at["none", "crime"] == 1000  # lowest crime ranks best
     assert np.isnan(pct.at["tiny", "crime"])
     assert pct["sell_soon"].isna().all()
+
+
+def test_no_bakery_factor_threshold():
+    pop = pd.Series([50, 500, 750, 1000, 5000])
+    assert score.no_bakery_factor(pop).tolist() == [1, 1, 2, 3, 3]

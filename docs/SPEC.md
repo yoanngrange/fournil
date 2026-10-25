@@ -101,6 +101,22 @@ must exist as a file. One build command generates all ~35k pages (≈ 10 kB each
 1 GB Pages limit); it runs the same way locally and in the GitHub Action. The pages are deployed as the
 Pages artifact and **never committed** to git (a monthly refresh would otherwise add ~35k files to history).
 
+### 3.6 URLs (decided Oct 25, 2026)
+| Page | URL |
+|---|---|
+| France (map) | `/` |
+| Département (map centred on it) | `/loire-atlantique/` |
+| Commune page | `/loire-atlantique/clisson-44043/` |
+| Sources & method | `/sources/` |
+Slug = lower case, accents removed, anything else → `-` (`pipeline/pages.py` and `src/lib/slug.js`, kept identical
+by a test). The INSEE code is what the site reads; a wrong or old slug, or `/commune/<code>`, is redirected by
+`404.html`. The map keeps its state in the query string and `#carte=zoom/lat/lon`; the path follows the
+département at the centre of the map. Pages are generated at build time (`scripts/build_site.sh`), with
+`sitemap.xml` and `robots.txt`; never committed.
+
+**Map card (Oct 25, 2026):** only score, inhabitants, bakeries, inhabitants per bakery, median income, and a link
+"Voir la fiche complète". Everything else lives on the commune page (§3.4).
+
 ### 3.5 Sources & method page (route `/sources/`)
 One page, linked from the sidebar, every card and the commune page footer. In French, plain language.
 - **Sources:** for each dataset, name, producer, vintage, licence, link, what we use it for (from `meta.json`).
@@ -123,9 +139,10 @@ Kept up to date with every milestone that adds or changes a criterion.
   user expects; communes with no bakery have no value (shown "aucune boulangerie", ignored by that slider).
   *(An Oct 17 version used `population / (bakeries + 1)`, "yours included"; dropped because the displayed figure
   no longer matched what users read.)*
-- **No-bakery boost:** for ranking, a commune with **0 bakeries** counts as `population × NO_BAKERY_BOOST`
-  (pipeline constant, **3**), so it ranks 3× above a commune of the same size with one bakery. The boost scales
-  with population, so a 60-inhabitant hamlet stays low.
+- **No-bakery boost:** for ranking, a commune with **0 bakeries** counts as `population × factor`, with
+  factor **1 below 500 inhabitants** (ranked as if it had one bakery: too small to sustain one), **3 from 1,000**,
+  linear in between (`NO_BAKERY_BOOST*` in `pipeline/config.py`; decided Oct 25, 2026 from the share of communes
+  that do have a bakery by size: 17 % at 300–500 inhabitants, 68 % at 1,000–1,500).
 - Category: Go ≥ 60, Maybe 40–59, Avoid < 40.
 - Presets (open question, §7): New opening, Takeover (sell_soon = High), Mobile.
 

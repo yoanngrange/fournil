@@ -58,7 +58,8 @@ export function createMap({ container, communes, departements, france, loadGeo, 
           source: 'deps',
           paint: {
             'fill-color': ['match', ['coalesce', ['feature-state', 'q'], -1], ...DEP_SCALE.flatMap((c, i) => [i, c]), '#EFEAE0'],
-            'fill-opacity': ['interpolate', ['linear'], ['zoom'], COMMUNE_ZOOM - 0.5, 1, COMMUNE_ZOOM + 0.5, 0.35],
+            // Simplified département shapes do not follow the coast closely: hide them under the communes.
+            'fill-opacity': ['interpolate', ['linear'], ['zoom'], COMMUNE_ZOOM - 0.5, 1, COMMUNE_ZOOM + 0.5, 0],
           },
         },
         {
@@ -98,6 +99,7 @@ export function createMap({ container, communes, departements, france, loadGeo, 
           type: 'line',
           source: 'deps',
           paint: {
+            'line-opacity': ['interpolate', ['linear'], ['zoom'], COMMUNE_ZOOM, 1, COMMUNE_ZOOM + 0.8, 0],
             'line-color': ['case', ['boolean', ['feature-state', 'hover'], false], '#1F1B16', '#A89E8E'],
             // `zoom` must be the input of the top-level interpolate, so the hover case goes inside.
             'line-width': [

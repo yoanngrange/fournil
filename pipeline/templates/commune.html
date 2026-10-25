@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <base href="{{base}}">
+  <title>{{title}}</title>
+  <meta name="description" content="{{description}}">
+  <link rel="canonical" href="{{canonical}}">
+  <meta name="fournil-commune" content="{{code}}">
+  <link rel="preload" href="fonts/public-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="vendor/maplibre-gl-6.11.2/maplibre-gl.css">
+  <link rel="stylesheet" href="src/styles.css">
+  <script type="module" src="src/commune.js"></script>
+</head>
+<body class="page">
+  <header class="page-top">
+    <a class="page-brand" href="./">Fournil</a>
+    <nav class="page-crumbs" aria-label="{{t_breadcrumb}}">
+      <a href="./">{{t_france}}</a><span aria-hidden="true">›</span><a href="{{dep_path}}">{{dep_name}}</a><span aria-hidden="true">›</span><span aria-current="page">{{name}}</span>
+    </nav>
+  </header>
+  <main class="page-main" id="page">
+    <h1 class="page-title">{{name}}</h1>
+    <p class="page-lead">{{description}}</p>
+  </main>
+</body>
+</html>
