@@ -110,6 +110,15 @@ def fetch(source_id: str, refresh: bool = False) -> dict:
     if entry and (RAW / entry["file"]).exists() and not refresh:
         return entry
 
+    if spec.get("custom") == "wikidata":  # many small queries rather than one file
+        from pipeline import cog, wikidata
+
+        RAW.mkdir(parents=True, exist_ok=True)
+        target = RAW / "wikidata.json"
+        print("  querying wikidata …", flush=True)
+        wikidata.download(target, sorted(cog.communes().dep.unique()))
+        return _record(source_id, target, spec["url"], {})
+
     resolved = resolve_datagouv(spec["datagouv"]) if "datagouv" in spec else {"url": spec["url"]}
     url = resolved["url"]
     suffix = spec.get("suffix") or (".parquet" if url.endswith(".parquet") else ".csv" if url.endswith(".csv") else ".zip")
@@ -122,6 +131,10 @@ def fetch(source_id: str, refresh: bool = False) -> dict:
     tmp.replace(target)
     print(f"    {target.stat().st_size / 1e6:.1f} MB", flush=True)
 
+    return _record(source_id, target, url, resolved)
+
+
+def _record(source_id: str, target, url: str, resolved: dict) -> dict:
     entry = {
         "file": target.name,
         "url": url,

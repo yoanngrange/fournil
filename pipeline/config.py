@@ -173,6 +173,15 @@ SOURCES = {
         "licence": "Licence Ouverte 2.0",
         "page": "https://www.data.gouv.fr/datasets/elections-municipales-2026-resultats-du-second-tour",
     },
+    "wikidata": {
+        "name": "Wikidata — photo (Wikimedia Commons) et article Wikipédia des communes",
+        "producer": "Wikimedia",
+        "vintage": "mensuel",
+        "url": "https://query.wikidata.org/sparql",
+        "custom": "wikidata",
+        "licence": "CC0 (données) ; photos sous leur propre licence, créditées sur la page",
+        "page": "https://www.wikidata.org/",
+    },
     "sirene": {
         "name": "Base Sirene des établissements",
         "producer": "Insee",
