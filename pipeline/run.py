@@ -96,10 +96,12 @@ def main(argv=None):
     display = build_geo.simplified(g)
     deps_gdf = build_geo.departements(set(communes.dep))
 
+    bread = build_local.bread_points(centres)
+
     print("5/5 checks and export")
     checks = quality_checks(df, deps)
     export.write_all(
-        df, centres, raw, pct, display, deps_gdf, adjacency, refs["income"], fonds, employers, politics, manifest, deps, checks
+        df, centres, raw, pct, display, deps_gdf, adjacency, refs["income"], fonds, employers, politics, bread, manifest, deps, checks
     )
     print(f"done in {time.time() - t0:.0f}s: {len(targets)} communes in {len(deps)} département(s) -> public/data/")
     print(f"  checks: {checks}")

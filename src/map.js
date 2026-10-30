@@ -49,6 +49,7 @@ export function createMap({ container, communes, departements, france, loadGeo, 
       sources: {
         deps: { type: 'geojson', data: departements, promoteId: 'code' },
         communes: { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, promoteId: 'code' },
+        range: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
       },
       layers: [
         { id: 'background', type: 'background', paint: { 'background-color': '#E9E3D7' } },
@@ -58,8 +59,13 @@ export function createMap({ container, communes, departements, france, loadGeo, 
           source: 'deps',
           paint: {
             'fill-color': ['match', ['coalesce', ['feature-state', 'q'], -1], ...DEP_SCALE.flatMap((c, i) => [i, c]), '#EFEAE0'],
-            // Simplified département shapes do not follow the coast closely: hide them under the communes.
-            'fill-opacity': ['interpolate', ['linear'], ['zoom'], COMMUNE_ZOOM - 0.5, 1, COMMUNE_ZOOM + 0.5, 0],
+            // Simplified département shapes do not follow the coast closely: hide them under the communes,
+            // but only once that département's communes are drawn (otherwise the map goes blank while loading).
+            'fill-opacity': [
+              'interpolate', ['linear'], ['zoom'],
+              COMMUNE_ZOOM - 0.5, 1,
+              COMMUNE_ZOOM + 0.5, ['case', ['boolean', ['feature-state', 'loaded'], false], 0, 1],
+            ],
           },
         },
         {
@@ -108,6 +114,12 @@ export function createMap({ container, communes, departements, france, loadGeo, 
               9, ['case', ['boolean', ['feature-state', 'hover'], false], 2.6, 1.6],
             ],
           },
+        },
+        {
+          id: 'range-line',
+          type: 'line',
+          source: 'range',
+          paint: { 'line-color': '#1F1B16', 'line-width': 1.6, 'line-dasharray': [4, 3] },
         },
         {
           id: 'communes-highlight',
@@ -187,6 +199,28 @@ export function createMap({ container, communes, departements, france, loadGeo, 
     loadVisible();
     on.move();
   });
+  // Start downloading while the map is still zooming or panning, not only once it stops.
+  let moveTimer = null;
+  map.on('move', () => {
+    if (moveTimer) return;
+    moveTimer = setTimeout(() => {
+      moveTimer = null;
+      loadVisible();
+    }, 250);
+  });
+
+  // Busy while a département is downloading or new polygons are still being drawn: the UI shows a spinner
+  // so a slow connection does not look like a bug.
+  let drawing = false;
+  const drawnSoon = new Set(); // départements whose communes were handed to MapLibre but may not be drawn yet
+  const notifyBusy = () => on.busy?.(loading.size > 0 || drawing);
+  map.on('idle', () => {
+    // Communes are on screen now: the département fill underneath can fade out.
+    for (const dep of drawnSoon) map.setFeatureState({ source: 'deps', id: dep }, { loaded: true });
+    drawnSoon.clear();
+    drawing = false;
+    notifyBusy();
+  });
 
   /** Load the commune polygons of every département intersecting the view (zoomed in only). */
   function loadVisible() {
@@ -196,14 +230,20 @@ export function createMap({ container, communes, departements, france, loadGeo, 
       if (loaded.has(dep) || loading.has(dep)) continue;
       if (e < b.getWest() || w > b.getEast() || n < b.getSouth() || s > b.getNorth()) continue;
       loading.add(dep);
+      notifyBusy();
       loadGeo(dep)
         .then((fc) => {
           loaded.set(dep, fc.features);
+          drawnSoon.add(dep);
+          drawing = true;
           map.getSource('communes').setData({ type: 'FeatureCollection', features: [...loaded.values()].flat() });
           on.geoLoaded(dep);
         })
         .catch(() => {})
-        .finally(() => loading.delete(dep));
+        .finally(() => {
+          loading.delete(dep);
+          notifyBusy();
+        });
     }
   }
 
@@ -254,7 +294,32 @@ export function createMap({ container, communes, departements, france, loadGeo, 
   });
 
   let selected = null;
+  let pin = null;
   return {
+    /** Delivery mode: bakehouse pin and, in distance mode, the dashed range circle. */
+    setDelivery(base, radiusKm) {
+      pin?.remove();
+      pin = null;
+      if (base) {
+        const el = document.createElement('div');
+        el.className = 'bakehouse-pin';
+        el.setAttribute('aria-hidden', 'true');
+        pin = new maplibregl.Marker({ element: el }).setLngLat([base.lon, base.lat]).addTo(map);
+      }
+      const features = [];
+      if (base && radiusKm) {
+        const ring = [];
+        for (let i = 0; i <= 64; i++) {
+          const a = (2 * Math.PI * i) / 64;
+          ring.push([
+            base.lon + (radiusKm / (111.32 * Math.cos((base.lat * Math.PI) / 180))) * Math.cos(a),
+            base.lat + (radiusKm / 110.57) * Math.sin(a),
+          ]);
+        }
+        features.push({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: ring } });
+      }
+      map.getSource('range')?.setData({ type: 'FeatureCollection', features });
+    },
     map,
     whenReady: new Promise((resolve) => map.once('load', resolve)),
     national,

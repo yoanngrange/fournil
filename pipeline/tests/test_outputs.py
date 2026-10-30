@@ -179,3 +179,13 @@ def test_local_context(index):
                 assert r["turnout"] is None or 0 < r["turnout"] <= 100
     clisson = load("commune/44043.json")
     assert clisson["politics"]["mayor"] and clisson["politics"]["rounds"]
+
+
+def test_bread_points(index):
+    for code in index["code"][:2000]:
+        pts = load(f"commune/{code}.json")["bread_points"]
+        assert len(pts) <= 300
+        assert [p["km"] for p in pts] == sorted(p["km"] for p in pts)
+        for p in pts:
+            assert set(p) == {"lat", "lon", "km", "kind", "name"}
+            assert p["kind"] in {"bakery", "pastry", "bake_off", "retail"} and p["km"] <= 5.0

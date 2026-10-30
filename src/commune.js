@@ -277,6 +277,56 @@ async function locator(el, p) {
   });
 }
 
+// ---------- points of sale of bread (IGN street map) ----------
+
+const IGN_PLAN =
+  'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2' +
+  '&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png';
+const KIND_COLOURS = { bakery: '#7A4B12', pastry: '#C47A3A', bake_off: '#3A78B8', retail: '#3D6B1E' };
+
+function breadList(p) {
+  if (!p.bread_points.length) return `<p class="pg-muted">${t['page.bread.none']}</p>`;
+  const rows = p.bread_points
+    .map(
+      (b) => `<li><span class="pg-dot" style="background:${KIND_COLOURS[b.kind]}"></span>
+        <span>${b.name ? esc(b.name) : `<i>${t['page.bread.noName']}</i>`} <small>${t[`page.bread.${b.kind}`]}</small></span>
+        <b>${b.km.toFixed(1).replace('.', ',')} km</b></li>`,
+    )
+    .join('');
+  return `<ul class="pg-points">${rows}</ul>`;
+}
+
+function breadMap(el, p) {
+  if (!p.bread_points.length) return;
+  const map = new maplibregl.Map({
+    container: el,
+    center: [p.lon, p.lat],
+    zoom: 13.5,
+    cooperativeGestures: true, // the page keeps scrolling; ctrl/two fingers to move the map
+    attributionControl: { compact: true, customAttribution: t['page.bread.attribution'] },
+    style: {
+      version: 8,
+      sources: { plan: { type: 'raster', tiles: [IGN_PLAN], tileSize: 256, maxzoom: 18 } },
+      layers: [{ id: 'plan', type: 'raster', source: 'plan' }],
+    },
+  });
+  map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
+  const townHall = document.createElement('div');
+  townHall.className = 'bakehouse-pin';
+  new maplibregl.Marker({ element: townHall }).setLngLat([p.lon, p.lat]).addTo(map);
+  for (const b of p.bread_points) {
+    const el = document.createElement('button');
+    el.type = 'button';
+    el.className = 'bread-pin';
+    el.style.background = KIND_COLOURS[b.kind];
+    el.setAttribute('aria-label', `${b.name || t['page.bread.noName']}, ${t[`page.bread.${b.kind}`]}`);
+    const popup = new maplibregl.Popup({ offset: 12, closeButton: false }).setHTML(
+      `<b>${b.name ? esc(b.name) : t['page.bread.noName']}</b><br>${t[`page.bread.${b.kind}`]} · ${b.km.toFixed(1).replace('.', ',')} km`,
+    );
+    new maplibregl.Marker({ element: el }).setLngLat([b.lon, b.lat]).setPopup(popup).addTo(map);
+  }
+}
+
 // ---------- page ----------
 
 async function start() {
@@ -335,6 +385,10 @@ async function start() {
       ${section('inc', t['page.incomeHousing'], `Insee Filosofi ${y.income} · ${tr('card.src.census', { year: y.census })}`, incomeHousing(p, p.dep_name))}
       ${section('safe', t['page.safetyServices'], `SSMSI ${y.crime} · ${tr('card.src.bpe', { year: y.bpe })}`, safetyServices(p))}
       ${section('pol', t['card.politics'], tr('card.src.politics', { year: y.election }), politics(p.politics))}
+      ${section('bread', t['page.bread'], tr('page.bread.src', { sirene: sireneMonth }),
+        `<div class="pg-bread"><div class="pg-bread-map" id="bread-map" role="img" aria-label="${esc(t['page.bread'])}"></div>
+          <div><div class="pg-legend">${Object.entries(KIND_COLOURS).map(([k, c]) => `<span><i style="background:${c}"></i>${t[`page.bread.${k}`]}</span>`).join('')}
+            <span><i class="is-pin"></i>${t['page.bread.townHall']}</span></div>${breadList(p)}</div></div>`, true)}
     </div>
     <p class="pg-sources">${tr('page.sources', { census: y.census, income: y.income, bpe: y.bpe, sirene: sireneMonth, crime: y.crime, election: y.election })}<a href="sources/">${t['sources.link']}</a></p>`;
 
@@ -345,6 +399,7 @@ async function start() {
     e.currentTarget.textContent = on ? '★' : '☆';
   });
   locator(document.getElementById('locator'), p).catch(() => {});
+  breadMap(document.getElementById('bread-map'), p);
 }
 
 start().catch((err) => {
