@@ -145,3 +145,74 @@ def politics(codes: set[str]) -> dict:
             ],
         }
     return out
+
+
+# ---------- Points of sale of bread around each commune (SIRENE, geolocated) ----------
+
+BREAD_KINDS = {"10.71C": "bakery", "10.71D": "pastry", "10.71B": "bake_off", "47.24Z": "retail"}
+BREAD_RADIUS_M = 5_000
+BREAD_MAX_POINTS = 300  # nearest first: big cities would otherwise list thousands
+
+
+def bread_points(centres: pd.DataFrame) -> dict:
+    """Per commune: bakeries, pastry shops, bake-off points and bread shops within BREAD_RADIUS_M of its centre.
+
+    Only establishments released publicly in SIRENE. Name = shop sign, usual name, or the company name for
+    legal entities; never the name of a sole trader (a person).
+    """
+    import geopandas as gpd  # heavy import kept local to this step
+
+    t = pq.read_table(
+        fetch.path("sirene"),
+        columns=[
+            "siren",
+            "activitePrincipaleEtablissement",
+            "statutDiffusionEtablissement",
+            "enseigne1Etablissement",
+            "denominationUsuelleEtablissement",
+            "coordonneeLambertAbscisseEtablissement",
+            "coordonneeLambertOrdonneeEtablissement",
+        ],
+        filters=(pc.field("etatAdministratifEtablissement") == "A")
+        & pc.field("activitePrincipaleEtablissement").isin(list(BREAD_KINDS)),
+    ).to_pandas()
+    t.columns = ["siren", "naf", "public", "sign", "usual_name", "x", "y"]
+    t["x"] = pd.to_numeric(t.x, errors="coerce")
+    t["y"] = pd.to_numeric(t.y, errors="coerce")
+    t = t[(t.public == "O") & t.x.notna() & t.y.notna()]
+
+    ul = pq.read_table(
+        fetch.path("sirene_ul"),
+        columns=["siren", "denominationUniteLegale", "categorieJuridiqueUniteLegale", "statutDiffusionUniteLegale"],
+        filters=pc.field("siren").isin(t.siren.unique().tolist()),
+    ).to_pandas()
+    ul.columns = ["siren", "company", "legal_form", "ul_public"]
+    t = t.merge(ul, on="siren", how="left")
+    company = t.company.where((t.legal_form != SOLE_TRADER) & (t.ul_public == "O"))
+    t["name"] = t.usual_name.fillna(t.sign).fillna(company)
+    t["kind"] = t.naf.map(BREAD_KINDS)
+
+    pts = gpd.GeoDataFrame(t[["name", "kind"]], geometry=gpd.points_from_xy(t.x, t.y), crs=2154)
+    ll = pts.to_crs(4326)
+    pts["lat"] = ll.geometry.y.round(5)
+    pts["lon"] = ll.geometry.x.round(5)
+    ctr = gpd.GeoDataFrame(
+        index=centres.index, geometry=gpd.points_from_xy(centres.lon, centres.lat), crs=4326
+    ).to_crs(2154)
+    zones = gpd.GeoDataFrame(index=ctr.index, geometry=ctr.buffer(BREAD_RADIUS_M), crs=2154)
+    zones.index.name = "commune"
+    pairs = gpd.sjoin(pts, zones.reset_index(), predicate="within")
+    pairs["dist"] = pairs.geometry.distance(ctr.geometry.reindex(pairs.commune).set_axis(pairs.index))
+    out = {}
+    for code, g in pairs.sort_values("dist").groupby("commune", sort=False):
+        out[code] = [
+            {
+                "lat": r.lat,
+                "lon": r.lon,
+                "km": round(r.dist / 1000, 1),
+                "kind": r.kind,
+                "name": r.name if isinstance(r.name, str) else None,
+            }
+            for r in g.head(BREAD_MAX_POINTS).itertuples()
+        ]
+    return out

@@ -107,7 +107,7 @@ export function createSidebar(root, { getState, setFilter, resetFilters, pick })
 
   return {
     /** ranges: visible min/max per criterion; topItems: [{id, name, value, colour}] (communes or départements) */
-    update({ ranges, inView, topTitle, topItems }) {
+    update({ ranges, inView, topTitle, topItems, topEmpty }) {
       const { filters } = getState();
       help.textContent = tr('filters.help', { n: inView.toLocaleString('fr-FR') });
       for (const c of CRITERIA) {
@@ -145,7 +145,7 @@ export function createSidebar(root, { getState, setFilter, resetFilters, pick })
       if (!topItems.length) {
         const li = document.createElement('li');
         li.className = 'top-empty';
-        li.textContent = t['top.empty'];
+        li.textContent = topEmpty || t['top.empty'];
         top.append(li);
       }
       topItems.forEach((item) => {

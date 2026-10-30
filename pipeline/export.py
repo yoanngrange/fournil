@@ -95,7 +95,9 @@ def index(df: pd.DataFrame, centres: pd.DataFrame, raw: pd.DataFrame, pct: pd.Da
     }
 
 
-def commune_page(code, row, all_rows, centres, dep_names, income_ref, raw, pct, neighbours, employers, politics) -> dict:
+def commune_page(
+    code, row, all_rows, centres, dep_names, income_ref, raw, pct, neighbours, employers, politics, bread
+) -> dict:
     hist = [[int(c[4:]), int(row[c])] for c in all_rows.columns if c.startswith("pop_") and pd.notna(row[c])]
     bands = [label for _, label in AGE_BANDS]
     here = centres.loc[[code]]
@@ -146,6 +148,7 @@ def commune_page(code, row, all_rows, centres, dep_names, income_ref, raw, pct, 
             "main_employers": employers.get(code, []),
         },
         "politics": politics.get(code),
+        "bread_points": bread.get(code, []),
         "bakery_history": {
             "since": int(HISTORY_FROM[:4]),
             "takeovers": int(row["hist_takeovers"]),
@@ -171,8 +174,8 @@ def commune_page(code, row, all_rows, centres, dep_names, income_ref, raw, pct, 
 
 
 def write_all(
-    df, centres, raw, pct, display_geom, deps_gdf, adjacency, income_ref, fonds, employers, politics, manifest, deps,
-    checks,
+    df, centres, raw, pct, display_geom, deps_gdf, adjacency, income_ref, fonds, employers, politics, bread, manifest,
+    deps, checks,
 ):
     """Replace public/data with the outputs for the given départements."""
     if OUT.exists():
@@ -200,6 +203,6 @@ def write_all(
 
     for code, row in scope.iterrows():
         page = commune_page(
-            code, row, df, centres, dep_names, income_ref, raw, pct, adjacency.get(code, []), employers, politics
+            code, row, df, centres, dep_names, income_ref, raw, pct, adjacency.get(code, []), employers, politics, bread
         )
         _write(OUT / "commune" / f"{code}.json", page)

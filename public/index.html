@@ -25,6 +25,30 @@
         </div>
         <p class="intro" data-i18n="app.intro"></p>
 
+        <section class="delivery" aria-labelledby="delivery-label">
+          <div class="delivery-switch">
+            <input type="checkbox" role="switch" class="switch" id="delivery" aria-describedby="delivery-hint">
+            <label for="delivery" id="delivery-label">
+              <span data-i18n="delivery.title"></span>
+              <small id="delivery-hint" data-i18n="delivery.hint"></small>
+            </label>
+          </div>
+          <div class="delivery-body" id="delivery-body" hidden>
+            <div class="segmented" role="group" data-i18n-aria-label="delivery.coverLabel">
+              <button type="button" id="cover-km" data-i18n="delivery.byDistance"></button>
+              <button type="button" id="cover-n" data-i18n="delivery.byNeighbours"></button>
+            </div>
+            <div class="delivery-range">
+              <label for="cover-slider" id="cover-label"></label>
+              <output for="cover-slider" id="cover-value"></output>
+            </div>
+            <input type="range" class="single" id="cover-slider">
+            <p class="help" id="cover-help"></p>
+            <div class="reach" id="reach" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <p class="filters-off" id="filters-off" data-i18n="delivery.filtersOff" hidden></p>
         <section class="filters" aria-labelledby="filters-title">
           <div class="section-head">
             <h2 id="filters-title" data-i18n="filters.title"></h2>
@@ -70,6 +94,12 @@
 
       <div class="legend pill" role="group" data-i18n-aria-label="legend.title">
         <div id="legend-deps"></div>
+        <div id="legend-delivery" hidden>
+          <div><span class="swatch" style="background:#4D9221"></span><span data-i18n-html="legend.d_open"></span></div>
+          <div><span class="swatch swatch-light" style="background:#D9CEBB"></span><span data-i18n="legend.d_has"></span></div>
+          <div><span class="swatch" style="background:#1F1B16;border-radius:50%"></span><span data-i18n="legend.d_base"></span></div>
+          <div><span class="swatch swatch-light" style="background:#F7F4EE"></span><span data-i18n="legend.d_out"></span></div>
+        </div>
         <div id="legend-communes" hidden>
           <div><span class="swatch" style="background:#4D9221"></span><span data-i18n-html="legend.go"></span></div>
           <div><span class="swatch swatch-light" style="background:#ECEAE1"></span><span data-i18n-html="legend.maybe"></span></div>
@@ -78,6 +108,9 @@
         </div>
       </div>
 
+      <div class="map-busy" id="map-busy" role="status" hidden>
+        <span class="spinner" aria-hidden="true"></span><span data-i18n="map.busy"></span>
+      </div>
       <div class="tooltip" id="tooltip" role="tooltip" hidden></div>
       <section class="card" id="card" role="dialog" aria-modal="false" aria-labelledby="card-title" hidden></section>
       <div class="status" id="status" role="status"></div>

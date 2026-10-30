@@ -43,6 +43,11 @@ export const BIN_COLOURS = {
   worst: '#C51B7D', // < 25
   out: '#D9D2C5', // filtered out
   unknown: '#D9D2C5',
+  // Delivery mode (docs/SPEC.md §3.3)
+  d_open: '#4D9221', // in range, no bakery: opportunity
+  d_has: '#D9CEBB', // in range, already has a bakery
+  d_out: '#F7F4EE', // outside the range
+  d_base: '#5B3A12', // the bakehouse
 };
 
 export const bin = (s) =>

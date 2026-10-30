@@ -81,6 +81,11 @@ Criteria (MVP):
 - Map colours in range: **no bakery = green (opportunity)**, has a bakery = neutral, outside range = faded.
 - Sidebar shows: communes in range, communes without a bakery, inhabitants reached, inhabitants with no bakery,
   and (contiguous mode) distance to the furthest commune.
+- *Implemented (M5):* before a bakehouse is placed, every commune is shown as with/without a bakery, so clusters of
+  bakery-less villages are visible at once; the sidebar ranks the communes on screen by inhabitants without a bakery
+  a bakehouse there would serve (up to 1,500 communes on screen). Score filters do not apply in this mode.
+- *Map loading:* while commune polygons download or draw, a "Chargement des communes…" indicator shows and the
+  département keeps its colour until its communes are drawn.
 
 ### 3.4 Commune page (`design/Commune.dc.html`, route `/commune/{code_insee}`)
 Header: breadcrumb, shortlist, "Export market study (PDF)" (locked, Pro, later).

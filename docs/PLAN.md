@@ -63,6 +63,10 @@ Start every milestone on Loire-Atlantique (44), then generalise.
 - Reach stats in the sidebar; national view metric switches to "communes without a bakery".
 - Adjacency must cross département borders (load neighbour départements' adjacency when needed).
 - **Done when:** a 40-commune contiguous block across a département border works.
+- *Done (Oct 2026):* switch, Distance (5–30 km, dashed circle) and Communes voisines (2–40) modes, bakehouse pin,
+  reach stats, national view by communes without a bakery, URL state (`d`, `cv`, `r`/`nb`, `b`), and a ranking of
+  the **best bakehouse spots on screen** (inhabitants without a bakery within reach) that surfaces clusters such as
+  north-east of Fougères. Tested: a 40-commune block from Louvigné-du-Désert spans 35, 50 and 53.
 
 ## M6 — Takeover signal
 - RNE ingestion (behind a feature flag until INPI terms are confirmed), aggregated `sell_soon` per commune.
