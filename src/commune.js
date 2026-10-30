@@ -327,6 +327,39 @@ function breadMap(el, p) {
   }
 }
 
+// ---------- photo (Wikimedia Commons) ----------
+
+const stripTags = (html) => {
+  const div = document.createElement('div');
+  div.innerHTML = html || '';
+  return div.textContent.trim();
+};
+
+/** Banner photo with its author and licence, asked from Commons so the credit is always current. */
+async function photo(el, p) {
+  const file = p.wiki?.file;
+  if (!file) return;
+  const api = new URL('https://commons.wikimedia.org/w/api.php');
+  api.search = new URLSearchParams({
+    action: 'query',
+    titles: `File:${file}`,
+    prop: 'imageinfo',
+    iiprop: 'url|extmetadata',
+    iiurlwidth: '1600',
+    format: 'json',
+    origin: '*',
+  });
+  const data = await fetch(api).then((r) => r.json());
+  const info = Object.values(data.query?.pages || {})[0]?.imageinfo?.[0];
+  if (!info?.thumburl) return;
+  const meta = info.extmetadata || {};
+  const author = stripTags(meta.Artist?.value) || t['page.photo.unknownAuthor'];
+  const licence = stripTags(meta.LicenseShortName?.value);
+  el.innerHTML = `<img src="${esc(info.thumburl)}" alt="${esc(tr('page.photo.alt', { name: p.name }))}" loading="eager">
+    <figcaption>${esc(tr('page.photo.credit', { author, licence }))} · <a href="${esc(info.descriptionurl)}">Wikimedia Commons</a></figcaption>`;
+  el.hidden = false;
+}
+
 // ---------- page ----------
 
 async function start() {
@@ -342,6 +375,7 @@ async function start() {
   const starred = () => readShortlist().has(code);
 
   main.innerHTML = `
+    <figure class="pg-photo" id="photo" hidden></figure>
     <div class="pg-hero">
       <div class="pg-hero-text">
         <h1 class="page-title">${esc(p.name)}</h1>
@@ -352,6 +386,7 @@ async function start() {
         </div>
         <p class="pg-muted small">${t['page.scoreHelp']}</p>
         <p class="pg-summary">${esc(summary(p))}</p>
+        ${p.wiki?.article ? `<p class="pg-wiki"><a href="${esc(p.wiki.article)}">${t['page.wikipedia']}</a></p>` : ''}
         <div class="pg-actions">
           <a class="pg-button" href="${depPath(p.dep_name)}?c=${p.code}#carte=11/${p.lat}/${p.lon}">${t['page.openMap']}</a>
           <button type="button" class="pg-star" aria-pressed="${starred()}" aria-label="${starred() ? t['card.shortlistRemove'] : t['card.shortlistAdd']}">${starred() ? '★' : '☆'}</button>
@@ -400,6 +435,7 @@ async function start() {
   });
   locator(document.getElementById('locator'), p).catch(() => {});
   breadMap(document.getElementById('bread-map'), p);
+  photo(document.getElementById('photo'), p).catch(() => {});
 }
 
 start().catch((err) => {

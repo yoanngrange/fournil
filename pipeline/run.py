@@ -14,7 +14,7 @@ import zipfile
 
 import pandas as pd
 
-from pipeline import build_geo, build_local, build_market, build_stats, cog, export, fetch, score
+from pipeline import build_geo, build_local, build_market, build_stats, cog, export, fetch, score, wikidata
 
 MAX_POP_GAP = 0.005  # DATA.md §5: population within 0.5 % of the official total
 MAX_BAKERY_GAP = 0.15  # DATA.md §5: BPE vs SIRENE bakery count, national
@@ -97,11 +97,12 @@ def main(argv=None):
     deps_gdf = build_geo.departements(set(communes.dep))
 
     bread = build_local.bread_points(centres)
+    wiki = wikidata.photos(set(df.index))
 
     print("5/5 checks and export")
     checks = quality_checks(df, deps)
     export.write_all(
-        df, centres, raw, pct, display, deps_gdf, adjacency, refs["income"], fonds, employers, politics, bread, manifest, deps, checks
+        df, centres, raw, pct, display, deps_gdf, adjacency, refs["income"], fonds, employers, politics, bread, wiki, manifest, deps, checks
     )
     print(f"done in {time.time() - t0:.0f}s: {len(targets)} communes in {len(deps)} département(s) -> public/data/")
     print(f"  checks: {checks}")

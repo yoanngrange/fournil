@@ -440,3 +440,13 @@ body.page { height: auto; background: var(--page); }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2.4s; } }
 @media (max-width: 720px) { .map-busy { bottom: auto; top: 108px; } }
+.pg-photo { margin: 0 0 22px; border-radius: var(--radius-card); overflow: hidden; background: var(--map-bg); position: relative; }
+.pg-photo[hidden] { display: none; }
+.pg-photo img { display: block; width: 100%; height: 320px; object-fit: cover; }
+.pg-photo figcaption {
+  position: absolute; right: 0; bottom: 0; max-width: 100%; padding: 4px 10px; font-size: 11px; color: #FFFFFF;
+  background: rgba(31, 27, 22, 0.7); border-top-left-radius: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.pg-photo figcaption a { color: #FFFFFF; }
+.pg-wiki { margin: 8px 0 0; font-size: 14px; }
+@media (max-width: 520px) { .pg-photo img { height: 200px; } .pg-photo figcaption { white-space: normal; } }
