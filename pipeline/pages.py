@@ -163,9 +163,6 @@ class Site:
   <base href="{self.root_path}">
   <title>{html.escape(t['seo.notFound.title'])}</title>
   <meta name="robots" content="noindex">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Coustard:wght@900&display=swap">
   <link rel="stylesheet" href="src/styles.css">
   <script type="module" src="src/notfound.js"></script>
 </head>

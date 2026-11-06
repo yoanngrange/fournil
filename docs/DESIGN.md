@@ -55,9 +55,7 @@ Hatch: 2 px lines of `#4A3414` at 60 %, 45°, every 6–7 px (CSS `--hatch`, Map
 | Text | **Atkinson Hyperlegible** 400/700 | Everything else (designed for low-vision readers) |
 | Figures and labels | **Courier Prime** 400/700 | Numbers, the "label" style (12 px caps, +0.08 em) for section labels and table heads |
 
-All four are SIL OFL. Atkinson, Big Shoulders and Courier Prime are self-hosted in `public/fonts/` (Latin subset, ~100 kB);
-Coustard is loaded from **Google Fonts** in every page's `<head>` (Yoann's choice, Nov 2026), so it is not
-available offline (fallback: Rockwell / Georgia) and the privacy page names Google as a third party.
+All four are SIL OFL, self-hosted in `public/fonts/` (Latin subset, ~130 kB total).
 
 ## Components
 
