@@ -62,6 +62,9 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          # ~35,000 files: GitHub's file sync regularly takes more than the default 10 minutes.
+          timeout: 1800000
 
   # Any failure (a source renamed or late, a data test failing, the deploy) emails Yoann.
   notify-failure:
