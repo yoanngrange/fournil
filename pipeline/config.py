@@ -262,6 +262,10 @@ NO_BAKERY_BOOST_FROM = 500  # …but not below this population (ranked as if it 
 NO_BAKERY_BOOST_FULL = 1000  # full boost from this population, linear in between
 CRITERIA = ["per_bakery", "income", "growth", "crime", "sell_soon"]
 LOWER_IS_BETTER = {"crime"}
+# Small communes: a rate measured on few people is unstable (4 -> 12 inhabitants = +300 %) and matters
+# less to a baker than the same rate over thousands of customers. Their rank is pulled towards the
+# middle (500) by reliability = pop / (pop + K): half-way at K inhabitants, almost untouched at 10 K.
+SMALL_COMMUNE_K = {"income": 500, "growth": 500}
 
 # Overseas départements are out of the MVP (codes 971-976 have three-digit département codes).
 def in_scope(dep_code: str) -> bool:

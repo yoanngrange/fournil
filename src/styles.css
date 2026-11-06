@@ -464,7 +464,7 @@ body.doc { height: auto; background: var(--paper); }
 .best-tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 0 4px; border: 1px solid var(--bleu); color: var(--bleu); }
 
 /* ---------- Commune page ---------- */
-body.page { height: auto; background: var(--paper); }
+body.page { height: auto; background: var(--paper); overflow-x: clip; }
 .page-top {
   /* Full-width band; its content lines up with .page-main (max 1180 px, 24 px gutter). */
   display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
@@ -480,6 +480,24 @@ body.page { height: auto; background: var(--paper); }
 .pg-muted { color: var(--ink-3); margin: 6px 0 0; }
 .pg-muted.small { font-size: 12px; margin-top: 2px; }
 .pg-hero { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 28px; align-items: start; }
+/* Name + postcode + score: sticky; compact (one line) once stuck. */
+.pg-head-sentinel { height: 1px; }
+.pg-head { position: sticky; top: 0; z-index: 5; margin: 0 -24px; padding: 0 24px; background: var(--paper); }
+.pg-head.is-stuck {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 16px;
+  padding: 8px 24px; background: var(--paper-2);
+}
+/* Stuck: the band runs the full width of the window, like the header. */
+.pg-head.is-stuck::before {
+  content: ''; position: absolute; z-index: -1; top: 0; bottom: 0; left: 50%; width: 100vw; transform: translateX(-50%);
+  background: var(--paper-2); border-bottom: var(--line);
+}
+.pg-head.is-stuck .page-title { font-size: 28px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pg-head.is-stuck .pg-muted { margin: 2px 0 0; font-size: 12px; }
+.pg-head.is-stuck .pg-score { margin: 0; padding: 0; border: 0; }
+.pg-head.is-stuck .pg-score b { font-size: 28px; }
+.pg-head.is-stuck .pg-score .swatch { width: 18px; height: 18px; }
+.pg-head.is-stuck .pg-score-help { display: none; }
 .pg-score { display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 10px 0; border-top: var(--line); border-bottom: var(--line); }
 .pg-score .swatch { width: 24px; height: 24px; }
 .pg-score b { font-family: var(--font-num); font-size: 46px; line-height: 1; }
@@ -493,6 +511,10 @@ body.page { height: auto; background: var(--paper); }
 .pg-button:hover { background: var(--bleu); border-color: var(--bleu); color: var(--paper-2); }
 .pg-star { width: 46px; height: 46px; border: var(--line); background: var(--paper-2); font-size: 20px; cursor: pointer; color: var(--ink); }
 .pg-star[aria-pressed="true"] { color: var(--paper-2); background: var(--rouge); border-color: var(--rouge); }
+.pg-tiles.is-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.pg-none { display: grid; gap: 4px; margin: 8px 0; padding: 14px 16px; border: var(--line); background: var(--paper-2); }
+.pg-none b { font-size: 18px; }
+.pg-none span { color: var(--ink-2); }
 .pg-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 8px 0; border: var(--line); background: var(--paper-2); }
 .pg-tile { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-right: var(--line-soft); border-bottom: var(--line-soft); }
 .pg-tile span { font-family: var(--font-num); font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
@@ -507,9 +529,8 @@ body.page { height: auto; background: var(--paper); }
 .pg-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 28px; }
 .pg-card { padding: 20px 22px; background: var(--paper-2); border: var(--line); min-width: 0; }
 .pg-card.is-wide { grid-column: 1 / -1; }
-.pg-card h2 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 28px; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1; }
+.pg-card h2 { margin: 0 0 12px; font-family: var(--font-display); font-weight: 800; font-size: 28px; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1; }
 .pg-card h3 { margin: 18px 0 6px; }
-.pg-source { margin: 4px 0 10px; font-size: 12px; color: var(--ink-3); }
 .pg-row { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: var(--line-soft); font-size: 14px; }
 .pg-row small { color: var(--ink-3); font-size: 12px; }
 .pg-row b { font-family: var(--font-num); text-align: right; }
@@ -529,12 +550,34 @@ body.page { height: auto; background: var(--paper); }
 .pg-why-rank b { font-family: var(--font-num); font-size: 18px; line-height: 1; }
 .pg-why-rank small { font-family: var(--font-num); font-size: 12px; }
 .pg-why-weight { font-family: var(--font-num); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
-.pg-why-na { font-size: 13px; color: var(--ink-3); }
+.pg-why-na { font-size: 14px; color: var(--ink-2); }
+.pg-why.is-missing .pg-why-label { color: var(--ink-2); }
+.pg-why-note { margin: 12px 0 0; font-size: 12px; color: var(--ink-3); }
+.pg-why-title { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pg-why-score { font-family: var(--font-num); font-size: 22px; font-weight: 700; letter-spacing: 0; text-transform: none; padding: 2px 8px; background: var(--ink); color: var(--paper-2); }
+/* "?" next to a section title: opens an explanation panel (a disclosure, not a hover tooltip, so it works on touch and keyboard). */
+.info-btn {
+  width: 26px; height: 26px; display: inline-grid; place-items: center; padding: 0; cursor: pointer;
+  font-family: var(--font-num); font-size: 15px; font-weight: 700; color: var(--ink);
+  background: var(--paper-2); border: 1.5px solid var(--ink); box-shadow: 2px 2px 0 var(--ink);
+}
+.info-btn:hover { background: var(--paper-3); }
+.info-btn[aria-expanded="true"] { background: var(--ink); color: var(--paper-2); box-shadow: none; transform: translate(2px, 2px); }
+.info-pop { margin: 12px 0 6px; padding: 12px 14px; background: var(--paper-3); border: var(--line); font-size: 13px; line-height: 1.5; }
+.info-pop ul { margin: 0 0 8px; padding-left: 18px; display: grid; gap: 6px; }
+.info-pop[hidden] { display: none; }
 .pg-chart { width: 100%; height: auto; display: block; }
 .pg-chart text { font-size: 11px; fill: var(--ink-3); font-family: var(--font-num); }
 .pg-chart .grid { stroke: var(--rule-soft); }
 .pg-chart .line { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linejoin: round; }
 .pg-chart .dot { fill: var(--rouge); stroke: var(--paper-2); stroke-width: 1.5; }
+.pg-chart-wrap { position: relative; touch-action: pan-y; }
+.pg-chart .guide { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 3 3; }
+.pg-chart .dot-on { fill: var(--rouge); stroke: var(--ink); stroke-width: 2; }
+.pg-chart-tip {
+  position: absolute; transform: translate(-50%, calc(-100% - 12px)); pointer-events: none; white-space: nowrap;
+  padding: 3px 8px; background: var(--ink); color: var(--paper-2); font-family: var(--font-num); font-size: 13px; font-weight: 700;
+}
 .pg-table-wrap { overflow-x: auto; }
 .pg-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .pg-table th, .pg-table td { text-align: left; padding: 7px 8px; border-bottom: var(--line-soft); }
@@ -574,6 +617,11 @@ body.page { height: auto; background: var(--paper); }
 }
 @media (max-width: 520px) {
   .page-main { padding: 20px 16px 40px; }
+  .pg-head { margin: 0 -16px; padding: 0 16px; }
+  .pg-head.is-stuck { padding: 8px 16px; }
+  .pg-head.is-stuck .page-title { font-size: 22px; }
+  .pg-head.is-stuck .pg-score b { font-size: 22px; }
+  .pg-head.is-stuck .pg-score span:last-child { font-size: 12px; }
   .page-top { padding: 10px max(16px, calc((100% - 1180px) / 2 + 16px)); gap: 6px 14px; }
   .page-title { font-size: 42px; }
   .pg-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }

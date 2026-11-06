@@ -52,6 +52,9 @@ Mockups in `design/` (see `design/README.md`). Layout: left sidebar 380 px, map 
   in real units and clamped to the visible bounds for display.
 - ~~An importance select~~ **Decided (Oct 2026): no user weights.** Weights are part of our scoring recipe,
   fixed and the same for everyone (per_bakery 3, income 2, growth 2, crime 1), explained on the sources page.
+  **Small communes (Nov 2026):** for `income` and `growth` the national rank is pulled towards the middle by
+  reliability = pop / (pop + 500) (`SMALL_COMMUNE_K` in `pipeline/config.py`): a 4 → 12 inhabitant commune no longer
+  ranks like a town with the same rate. Shown on the commune page ("?" next to *Pourquoi cette note ?*).
   Users only filter. The current value of each handle is shown in a bubble above it; the min and max of the
   communes on screen stay visible below the track.
 - "Reset filters" link.

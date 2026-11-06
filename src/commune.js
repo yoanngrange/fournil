@@ -18,7 +18,7 @@ const tile = (label, value, sub = '') =>
   `<div class="pg-tile"><span>${label}</span><b>${value}</b>${sub ? `<small>${sub}</small>` : ''}</div>`;
 const section = (id, title, source, body, wide = false) =>
   `<section class="pg-card${wide ? ' is-wide' : ''}" aria-labelledby="${id}">
-    <h2 id="${id}">${title}</h2>${source ? `<p class="pg-source">${source}</p>` : ''}${body}</section>`;
+    <h2 id="${id}">${title}</h2>${body}</section>`;
 const bar = (label, value, share, text) =>
   `<div class="pg-bar"><span>${label}</span><div class="pg-bar-track"><i style="width:${Math.max(0, Math.min(100, share))}%"></i></div><b>${text ?? value}</b></div>`;
 
@@ -45,22 +45,72 @@ function summary(p) {
   return `${text}.`;
 }
 
+const SMALL_COMMUNE_NOTE_BELOW = 2000; // reliability < 0.8 (pipeline/config.py SMALL_COMMUNE_K = 500)
+
 function why(p) {
-  return CRITERIA.filter((c) => c.weighted)
+  const rows = CRITERIA.filter((c) => c.weighted)
     .map((c) => {
       const crit = p.criteria[c.key];
       const rank = crit.pct == null ? null : Math.round(crit.pct / 10);
+      const weight = `<span class="pg-why-weight">${tr('card.weight', { w: `×${c.weight}` })}</span>`;
+      if (rank == null) {
+        // Missing value: said once, on the right, with the consequence; no empty bar.
+        return `<div class="pg-why is-missing">
+          <div class="pg-why-head">
+            <span class="pg-why-label">${t[`crit.${c.key}`]}</span>
+            <span class="pg-why-rank"><span class="pg-why-na">${t['card.notPublished']}</span>
+              <span class="pg-why-weight">${t['page.why.notCounted']}</span></span>
+          </div>
+        </div>`;
+      }
       const value = c.key === 'per_bakery' && !p.bakeries ? t['page.why.noBakery'] : fmtCriterion(c.key, crit.v);
       return `<div class="pg-why">
         <div class="pg-why-head">
           <span class="pg-why-label">${t[`crit.${c.key}`]} <small>${value}</small></span>
-          <span class="pg-why-rank">${rank == null ? `<span class="pg-why-na">${t['card.notPublished']}</span>` : `<span><b>${rank}</b><small> / 100</small></span>`}
-            <span class="pg-why-weight">${tr('card.weight', { w: t[`weight.${c.weight}`] })}</span></span>
+          <span class="pg-why-rank"><span><b>${rank}</b><small> / 100</small></span>${weight}</span>
         </div>
-        <div class="pg-bar-track"><i style="width:${rank ?? 0}%"></i></div>
+        <div class="pg-bar-track"><i style="width:${rank}%"></i></div>
       </div>`;
     })
     .join('');
+  const small = p.pop < SMALL_COMMUNE_NOTE_BELOW ? `<p class="pg-why-note">${tr('page.why.small', { pop: fmtInt(p.pop) })}</p>` : '';
+  return rows + small;
+}
+
+/** Section title with the score, and a "?" button that opens the explanation of the calculation. */
+function whyTitle(s) {
+  return `<span class="pg-why-title">${t['page.why']}${s == null ? '' : ` <span class="pg-why-score">${tr('page.why.score', { s })}</span>`}
+    <button type="button" class="info-btn" aria-expanded="false" aria-controls="why-info" aria-label="${t['page.why.info']}">?</button></span>`;
+}
+
+function whyInfo() {
+  const items = t['page.why.infoBody'].map((x) => `<li>${x}</li>`).join('');
+  return `<div class="info-pop" id="why-info" hidden><ul>${items}</ul><a href="sources/#how-title">${t['page.why.method']} →</a></div>`;
+}
+
+/** The name, postcode and score stay on screen while scrolling; once stuck they shrink to one line. */
+function stickyHead(root) {
+  const head = root.querySelector('#pg-head');
+  const sentinel = root.querySelector('.pg-head-sentinel');
+  if (!head || !sentinel || !('IntersectionObserver' in window)) return;
+  new IntersectionObserver(([e]) => head.classList.toggle('is-stuck', !e.isIntersecting)).observe(sentinel);
+}
+
+function wireInfo(root) {
+  const btn = root.querySelector('.info-btn');
+  const pop = root.querySelector('#why-info');
+  if (!btn || !pop) return;
+  const set = (open) => {
+    btn.setAttribute('aria-expanded', String(open));
+    pop.hidden = !open;
+  };
+  btn.addEventListener('click', () => set(pop.hidden));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !pop.hidden) {
+      set(false);
+      btn.focus();
+    }
+  });
 }
 
 function historyChart(history) {
@@ -85,8 +135,53 @@ function historyChart(history) {
     .join('');
   const labels = history.map(([y]) => `<text x="${x(y)}" y="${H - 8}" text-anchor="middle">${y}</text>`).join('');
   const desc = history.map(([y, v]) => tr('page.historyPoint', { year: y, pop: fmtInt(v) })).join(' ; ');
-  return `<svg class="pg-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(desc)}">${grid}
-    <polyline points="${points}" class="line"/>${dots}${labels}</svg>`;
+  const data = history.map(([y, v]) => [Math.round(x(y)), Math.round(yy(v)), y, fmtInt(v)]);
+  return `<div class="pg-chart-wrap" data-w="${W}" data-h="${H}" data-points='${JSON.stringify(data)}'>
+    <svg class="pg-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(desc)}">${grid}
+    <polyline points="${points}" class="line"/>${dots}${labels}
+    <line class="guide" x1="0" x2="0" y1="${pad.t}" y2="${H - pad.b}" visibility="hidden"/>
+    <circle class="dot-on" r="6" visibility="hidden"/></svg>
+    <div class="pg-chart-tip" hidden></div></div>`;
+}
+
+/** Population chart: the nearest census value follows the pointer (desktop) or the finger (tap). */
+function wireChart(wrap) {
+  const svg = wrap.querySelector('svg');
+  const tip = wrap.querySelector('.pg-chart-tip');
+  const guide = svg.querySelector('.guide');
+  const dot = svg.querySelector('.dot-on');
+  const data = JSON.parse(wrap.dataset.points);
+  const W = Number(wrap.dataset.w);
+  const show = (clientX) => {
+    const box = svg.getBoundingClientRect();
+    const vx = ((clientX - box.left) / box.width) * W;
+    const [px, py, year, pop] = data.reduce((a, b) => (Math.abs(b[0] - vx) < Math.abs(a[0] - vx) ? b : a));
+    guide.setAttribute('x1', px);
+    guide.setAttribute('x2', px);
+    dot.setAttribute('cx', px);
+    dot.setAttribute('cy', py);
+    guide.setAttribute('visibility', 'visible');
+    dot.setAttribute('visibility', 'visible');
+    tip.textContent = tr('page.historyPoint', { year, pop });
+    tip.hidden = false;
+    const k = box.width / W;
+    const left = Math.min(Math.max(px * k, tip.offsetWidth / 2), box.width - tip.offsetWidth / 2);
+    tip.style.left = `${left}px`;
+    tip.style.top = `${py * k}px`;
+  };
+  const hide = () => {
+    tip.hidden = true;
+    guide.setAttribute('visibility', 'hidden');
+    dot.setAttribute('visibility', 'hidden');
+  };
+  svg.addEventListener('pointermove', (e) => show(e.clientX));
+  svg.addEventListener('pointerdown', (e) => show(e.clientX));
+  svg.addEventListener('pointerleave', (e) => {
+    if (e.pointerType === 'mouse') hide();
+  });
+  document.addEventListener('pointerdown', (e) => {
+    if (!wrap.contains(e.target)) hide(); // a tap elsewhere closes it on touch screens
+  });
 }
 
 function pyramid(p) {
@@ -124,10 +219,18 @@ function competition(p, fonds, depName) {
   const priceHint = dep
     ? tr('card.fondsDep', { dep: esc(depName), n: fmtInt(dep.n), since, q1: fmtEuro(dep.q1), q3: fmtEuro(dep.q3) })
     : tr('card.fondsFrance', { n: fmtInt(prices.n), since, q1: fmtEuro(prices.q1), q3: fmtEuro(prices.q3) });
-  return `<div class="pg-tiles">
-      ${tile(t['card.bakeries'], p.bakeries ? fmtInt(p.bakeries) : t['card.none'])}
-      ${tile(t['card.perBakery'], p.bakeries ? fmtInt(p.pop / p.bakeries) : t['card.noBakery'])}
-    </div>
+  // No bakery: one statement and where the nearest one is, instead of two tiles both saying "aucune".
+  const closest = p.nearby.filter((n) => n.code !== p.code && n.bakeries).sort((a, b) => a.km - b.km)[0];
+  const head = p.bakeries
+    ? `<div class="pg-tiles is-2">
+      ${tile(t['card.bakeries'], fmtInt(p.bakeries))}
+      ${tile(t['card.perBakery'], fmtInt(p.pop / p.bakeries))}
+    </div>`
+    : `<div class="pg-none">
+      <b>${t['page.noBakery']}</b>
+      ${closest ? `<span>${tr('page.noBakery.closest', { name: esc(closest.name), km: closest.km.toFixed(1).replace('.', ',') })}</span>` : ''}
+    </div>`;
+  return `${head}
     <h3>${tr('page.within', { km: c.km })}</h3>
     ${row(t['page.within.bakeries'], fmtInt(c.bakeries))}
     ${row(t['page.within.communes'], fmtInt(c.communes))}
@@ -408,15 +511,20 @@ async function start() {
 
   main.innerHTML = `
     <figure class="pg-photo" id="photo" hidden></figure>
-    <div class="pg-hero">
-      <div class="pg-hero-text">
+    <div class="pg-head-sentinel" aria-hidden="true"></div>
+    <div class="pg-head" id="pg-head">
+      <div class="pg-head-id">
         <h1 class="page-title">${esc(p.name)}</h1>
         <p class="pg-muted">${[postcodes(p.postcodes), esc(p.dep_name)].filter(Boolean).join(' · ')}</p>
-        <div class="pg-score">
-          <span class="swatch ${cat === 'avoid' ? 'is-hatched' : ''}" style="background:${BIN_COLOURS[bin(s)]}"></span>
-          <b>${s ?? '–'}</b><span>${s == null ? t['cat.unknown'] : tr('card.outOf', { cat: t[`cat.${cat}`] })}</span>
-        </div>
-        <p class="pg-muted small">${t['page.scoreHelp']}</p>
+      </div>
+      <div class="pg-score">
+        <span class="swatch ${cat === 'avoid' ? 'is-hatched' : ''}" style="background:${BIN_COLOURS[bin(s)]}"></span>
+        <b>${s ?? '–'}</b><span>${s == null ? t['cat.unknown'] : tr('card.outOf', { cat: t[`cat.${cat}`] })}</span>
+      </div>
+      <p class="pg-muted small pg-score-help">${t['page.scoreHelp']}</p>
+    </div>
+    <div class="pg-hero">
+      <div class="pg-hero-text">
         <p class="pg-summary">${esc(summary(p))}</p>
         ${p.wiki?.article ? `<p class="pg-wiki"><a href="${esc(p.wiki.article)}">${t['page.wikipedia']}</a></p>` : ''}
         <div class="pg-actions">
@@ -442,7 +550,7 @@ async function start() {
       </figure>
     </div>
     <div class="pg-grid">
-      ${section('why', t['page.why'], t['page.why.help'], why(p))}
+      ${section('why', whyTitle(s), '', whyInfo() + why(p))}
       ${section('demo', t['card.demography'], tr('card.src.census', { year: y.census }),
         `<h3>${tr('page.history', { first })}</h3>${historyChart(p.history)}
          ${firstPop ? row(tr('page.change', { first }), fmtSigned((100 * (p.history.at(-1)[1] - firstPop)) / firstPop)) : ''}
@@ -468,6 +576,9 @@ async function start() {
   });
   locator(document.getElementById('locator'), p).catch(() => {});
   breadMap(document.getElementById('bread-map'), p);
+  wireInfo(main);
+  stickyHead(main);
+  main.querySelectorAll('.pg-chart-wrap').forEach(wireChart);
   photo(document.getElementById('photo'), p).catch(() => {});
 }
 

@@ -33,7 +33,8 @@ Explain trade-offs briefly when you deviate from this file.
   Corsica `2A004`). Freeze one COG (Code officiel géographique) vintage per pipeline run.
 - Never commit raw downloads (`pipeline/raw/` is git-ignored). Commit only pipeline code.
 - Generated data is built in CI; do not hand-edit files in `public/data/`.
-- Every number shown in the UI must carry its source and year (see DATA.md).
+- Every number shown in the UI must carry its source and year (see DATA.md). On the commune page the
+  sources are listed once, at the bottom, and on the sources / legal pages, not under each section title.
 - Missing values are normal (statistical secrecy on small communes). Show "non diffusé",
   never 0, and drop that criterion from the score for that commune (re-normalise weights).
 - Accessibility: real buttons/inputs/labels, keyboard access to map features (search + list),

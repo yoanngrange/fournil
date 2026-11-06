@@ -37,3 +37,25 @@ def test_crime_is_inverted_and_no_bakery_is_boosted():
 def test_no_bakery_factor_threshold():
     pop = pd.Series([50, 500, 750, 1000, 5000])
     assert score.no_bakery_factor(pop).tolist() == [1, 1, 2, 3, 3]
+
+
+def test_small_communes_pulled_to_the_middle():
+    """A tiny commune with an extreme growth rate no longer ranks like a town with the same rate."""
+    import pandas as pd
+
+    from pipeline import score
+
+    n = 200
+    df = pd.DataFrame(
+        {"pop": [10, 20_000] + [1_000] * n, "bakeries": [1, 5] + [1] * n},
+        index=[f"{i:05d}" for i in range(n + 2)],
+    )
+    raw = pd.DataFrame(
+        {"per_bakery": 100.0, "income": 20_000.0, "growth": [9.0, 9.0] + [i / 100 for i in range(n)], "crime": 1.0, "sell_soon": float("nan")},
+        index=df.index,
+    )
+    pct = score.percentiles(raw, df)
+    tiny, town = pct.loc["00000", "growth"], pct.loc["00001", "growth"]
+    assert town > 950  # a big town keeps (almost) its rank
+    assert 500 <= tiny < 600  # a 10-inhabitant commune lands near the middle
+    assert score.reliability(pd.Series([500]), 500).iloc[0] == 0.5
