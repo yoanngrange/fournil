@@ -5,15 +5,15 @@ import { BIN_COLOURS } from './lib/scoring.js';
 const MAX_LABELS = 14;
 const LABEL_SPACING_PX = 90;
 export const COMMUNE_ZOOM = 7; // below: départements; from here: communes
-export const DEP_SCALE = ['#F1F4E8', '#D3E8B5', '#A9D27E', '#6FAE45', '#3F7F1F']; // design/README.md
+export const DEP_SCALE = ['#EEF1F7', '#C9D4EA', '#9BB0DA', '#5F80C4', '#1E3F8A']; // design/README.md
 
-/** Diagonal hatch (2 px lines every ~7 px, #6E0140 at 55 %), drawn at 2× for sharp screens. */
+/** Diagonal hatch (2 px lines every ~7 px, #4A3414 at 60 %), drawn at 2× for sharp screens. */
 function hatchImage() {
   const size = 20;
   const data = new Uint8ClampedArray(size * size * 4);
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
-      if ((x + y) % size < 6) data.set([110, 1, 64, Math.round(0.55 * 255)], (y * size + x) * 4);
+      if ((x + y) % size < 6) data.set([74, 52, 20, Math.round(0.6 * 255)], (y * size + x) * 4);
     }
   }
   return { width: size, height: size, data };
@@ -52,7 +52,7 @@ export function createMap({ container, communes, departements, france, loadGeo, 
         range: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
       },
       layers: [
-        { id: 'background', type: 'background', paint: { 'background-color': '#E9E3D7' } },
+        { id: 'background', type: 'background', paint: { 'background-color': '#ECE7DD' } },
         {
           id: 'deps-fill',
           type: 'fill',
@@ -98,7 +98,7 @@ export function createMap({ container, communes, departements, france, loadGeo, 
           type: 'line',
           source: 'communes',
           minzoom: COMMUNE_ZOOM - 0.5,
-          paint: { 'line-color': '#FFFDF8', 'line-width': ['interpolate', ['linear'], ['zoom'], 7, 0.4, 11, 1.2] },
+          paint: { 'line-color': '#FAF6EC', 'line-width': ['interpolate', ['linear'], ['zoom'], 7, 0.4, 11, 1.2] },
         },
         {
           id: 'deps-line',
@@ -106,7 +106,7 @@ export function createMap({ container, communes, departements, france, loadGeo, 
           source: 'deps',
           paint: {
             'line-opacity': ['interpolate', ['linear'], ['zoom'], COMMUNE_ZOOM, 1, COMMUNE_ZOOM + 0.8, 0],
-            'line-color': ['case', ['boolean', ['feature-state', 'hover'], false], '#1F1B16', '#A89E8E'],
+            'line-color': ['case', ['boolean', ['feature-state', 'hover'], false], '#1C1A17', '#A89E8E'],
             // `zoom` must be the input of the top-level interpolate, so the hover case goes inside.
             'line-width': [
               'interpolate', ['linear'], ['zoom'],
@@ -119,14 +119,14 @@ export function createMap({ container, communes, departements, france, loadGeo, 
           id: 'range-line',
           type: 'line',
           source: 'range',
-          paint: { 'line-color': '#1F1B16', 'line-width': 1.6, 'line-dasharray': [4, 3] },
+          paint: { 'line-color': '#1C1A17', 'line-width': 1.6, 'line-dasharray': [4, 3] },
         },
         {
           id: 'communes-highlight',
           type: 'line',
           source: 'communes',
           paint: {
-            'line-color': '#1F1B16',
+            'line-color': '#1C1A17',
             'line-width': [
               'case',
               ['boolean', ['feature-state', 'selected'], false], 3,
@@ -348,5 +348,11 @@ export function createMap({ container, communes, departements, france, loadGeo, 
     zoomIn: () => map.zoomIn(),
     zoomOut: () => map.zoomOut(),
     reset: () => map.fitBounds(france, { padding: 24 }),
+    /** Centre on a point with about `km` kilometres across the smaller side of the screen. */
+    around(lat, lon, km) {
+      const dLat = km / 2 / 111;
+      const dLon = km / 2 / (111 * Math.cos((lat * Math.PI) / 180));
+      map.fitBounds([[lon - dLon, lat - dLat], [lon + dLon, lat + dLat]], { padding: 12, duration: 800 });
+    },
   };
 }

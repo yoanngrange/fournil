@@ -254,14 +254,14 @@ async function locator(el, p) {
       version: 8,
       sources: { c: { type: 'geojson', data: { type: 'FeatureCollection', features } } },
       layers: [
-        { id: 'bg', type: 'background', paint: { 'background-color': '#F4EFE6' } },
+        { id: 'bg', type: 'background', paint: { 'background-color': '#F2ECDF' } },
         {
           id: 'fill',
           type: 'fill',
           source: 'c',
-          paint: { 'fill-color': ['match', ['get', 'kind'], 'here', '#3D6B1E', 'without', '#B8E186', '#CFC5B4'] },
+          paint: { 'fill-color': ['match', ['get', 'kind'], 'here', '#B42318', 'without', '#9BB0DA', '#DCD3C2'] },
         },
-        { id: 'line', type: 'line', source: 'c', paint: { 'line-color': '#FFFDF8', 'line-width': 1.2 } },
+        { id: 'line', type: 'line', source: 'c', paint: { 'line-color': '#FAF6EC', 'line-width': 1.2 } },
       ],
     },
   });
@@ -282,7 +282,7 @@ async function locator(el, p) {
 const IGN_PLAN =
   'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2' +
   '&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png';
-const KIND_COLOURS = { bakery: '#7A4B12', pastry: '#C47A3A', bake_off: '#3A78B8', retail: '#3D6B1E' };
+const KIND_COLOURS = { bakery: '#B42318', pastry: '#E08A5A', bake_off: '#1E3F8A', retail: '#8A8172' };
 
 function breadList(p) {
   if (!p.bread_points.length) return `<p class="pg-muted">${t['page.bread.none']}</p>`;
@@ -403,9 +403,9 @@ async function start() {
       <figure class="pg-locator">
         <div class="pg-locator-map" id="locator" role="img" aria-label="${esc(t['page.locator'])}"></div>
         <figcaption>
-          <span><i style="background:#3D6B1E"></i>${t['page.locator.here']}</span>
-          <span><i style="background:#CFC5B4"></i>${t['page.locator.with']}</span>
-          <span><i style="background:#B8E186"></i>${t['page.locator.without']}</span>
+          <span><i style="background:#B42318"></i>${t['page.locator.here']}</span>
+          <span><i style="background:#DCD3C2"></i>${t['page.locator.with']}</span>
+          <span><i style="background:#9BB0DA"></i>${t['page.locator.without']}</span>
         </figcaption>
       </figure>
     </div>
@@ -425,7 +425,8 @@ async function start() {
           <div><div class="pg-legend">${Object.entries(KIND_COLOURS).map(([k, c]) => `<span><i style="background:${c}"></i>${t[`page.bread.${k}`]}</span>`).join('')}
             <span><i class="is-pin"></i>${t['page.bread.townHall']}</span></div>${breadList(p)}</div></div>`, true)}
     </div>
-    <p class="pg-sources">${tr('page.sources', { census: y.census, income: y.income, bpe: y.bpe, sirene: sireneMonth, crime: y.crime, election: y.election })}<a href="sources/">${t['sources.link']}</a></p>`;
+    <p class="pg-sources">${tr('page.sources', { census: y.census, income: y.income, bpe: y.bpe, sirene: sireneMonth, crime: y.crime, election: y.election })}<a href="sources/">${t['sources.link']}</a></p>
+    <div class="callout pg-disclaimer"><p>${tr('page.disclaimer', { built: new Date(meta.built_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) })}</p></div>`;
 
   main.querySelector('.pg-star').addEventListener('click', (e) => {
     const on = toggleShortlist(code);

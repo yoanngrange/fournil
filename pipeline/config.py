@@ -3,14 +3,18 @@
 Change a vintage here and nowhere else. Every source listed in SOURCES ends up in public/data/meta.json.
 """
 
+import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "pipeline" / "raw"
 OUT = ROOT / "public" / "data"
 
-# Public address of the site (canonical URLs, sitemap).
-SITE_URL = "https://yoanngrange.github.io/fournil/"
+# Public address of the site (canonical URLs, sitemap, 404 base). CI may override it.
+SITE_URL = os.environ.get("SITE_URL", "https://yoanngrange.github.io/fournil/")
+
+# Cloudflare Web Analytics (cookieless). Empty: no analytics script on the pages (local builds, forks).
+ANALYTICS_TOKEN = os.environ.get("CF_BEACON_TOKEN", "")
 
 # One COG (Code officiel géographique) vintage per run. Every commune is keyed on its code in this vintage.
 COG_YEAR = 2026

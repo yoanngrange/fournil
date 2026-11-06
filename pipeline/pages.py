@@ -18,7 +18,7 @@ import unicodedata
 from pathlib import Path
 from urllib.parse import urlparse
 
-from pipeline.config import OUT, ROOT, SITE_URL
+from pipeline.config import ANALYTICS_TOKEN, OUT, ROOT, SITE_URL
 
 TEMPLATE = Path(__file__).parent / "templates" / "commune.html"
 FR = ROOT / "src" / "i18n" / "fr.js"
@@ -46,6 +46,23 @@ def strings() -> dict:
     for m in re.finditer(r"^\s*'([\w.]+)':\s*'((?:[^'\\]|\\.)*)',\s*$", FR.read_text(encoding="utf-8"), re.M):
         out[m.group(1)] = m.group(2).replace("\\'", "'")
     return out
+
+
+def analytics_tag(token: str | None = None) -> str:
+    """Cloudflare Web Analytics beacon (cookieless), or nothing when no token is configured."""
+    token = ANALYTICS_TOKEN if token is None else token
+    if not token:
+        return ""
+    return (
+        "<script defer src='https://static.cloudflareinsights.com/beacon.min.js' "
+        f"data-cf-beacon='{{\"token\": \"{html.escape(token)}\"}}'></script>"
+    )
+
+
+# Text pages copied from public/ that carry the <!-- analytics --> marker.
+STATIC_PAGES = ["index.html", "sources/index.html", "infos-legales/index.html"]
+# Footer links (mirror of LINKS in src/lib/chrome.js): href, fr.js key.
+FOOTER_LINKS = [("sources/", "sources.link"), ("infos-legales/#donnees", "updates.link"), ("infos-legales/", "legal.link")]
 
 
 def _fill(template: str, **params) -> str:
@@ -106,7 +123,20 @@ class Site:
             "t_france": t["map.france"],
             "t_breadcrumb": t["map.breadcrumb"],
         }
-        return re.sub(r"\{\{(\w+)\}\}", lambda m: html.escape(str(params[m.group(1)]), quote=True), self.template)
+        raw = {"footer": self.footer(), "analytics": analytics_tag()}
+        return re.sub(
+            r"\{\{(\w+)\}\}",
+            lambda m: raw[m.group(1)] if m.group(1) in raw else html.escape(str(params[m.group(1)]), quote=True),
+            self.template,
+        )
+
+    def footer(self) -> str:
+        t = self.t
+        items = "".join(f'<li><a href="{href}">{html.escape(t[key])}</a></li>' for href, key in FOOTER_LINKS)
+        return (
+            f'<footer class="site-footer"><div class="site-footer-inner"><ul>{items}</ul>'
+            f"<p>{html.escape(t['footer.text'])}</p></div></footer>"
+        )
 
     def dep_page(self, dep: str) -> str:
         """The map app, with relative URLs resolved from the site root and the département preselected."""
@@ -118,7 +148,7 @@ class Site:
             f'<base href="../">\n  <meta name="fournil-dep" content="{dep}">\n'
             f'  <link rel="canonical" href="{SITE_URL}{dep_path(name)}">'
         )
-        page = self.index_html.replace("<head>", f"<head>\n  {head}", 1)
+        page = self.index_html.replace("<head>", f"<head>\n  {head}", 1).replace("<!-- analytics -->", analytics_tag())
         page = re.sub(r"<title>.*?</title>", f"<title>{title}</title>", page, count=1)
         return re.sub(r'<meta name="description" content="[^"]*">', f'<meta name="description" content="{desc}">', page, count=1)
 
@@ -147,7 +177,7 @@ class Site:
 """
 
     def sitemap(self) -> str:
-        urls = [SITE_URL, SITE_URL + "sources/"]
+        urls = [SITE_URL, SITE_URL + "sources/", SITE_URL + "infos-legales/"]
         urls += [SITE_URL + dep_path(self.dep_names[d]) for d in sorted(self.exported)]
         urls += [
             SITE_URL + commune_path(self.dep_names[c["dep"]], c["name"], code)
@@ -182,6 +212,10 @@ class Site:
         for code, c in self.communes.items():
             _put(site / commune_path(self.dep_names[c["dep"]], c["name"], code) / "index.html", self.commune_page(code))
             n += 1
+        for rel in STATIC_PAGES:
+            f = site / rel
+            if f.exists():
+                f.write_text(f.read_text(encoding="utf-8").replace("<!-- analytics -->", analytics_tag()), encoding="utf-8")
         _put(site / "404.html", self.not_found_page())
         _put(site / "sitemap.xml", self.sitemap())
         _put(site / "robots.txt", f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}sitemap.xml\n")

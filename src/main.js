@@ -144,7 +144,11 @@ async function start() {
     document.getElementById('search-results'),
     document.getElementById('search-status'),
     communes,
-    (code) => select(code, { fly: true, focus: true }),
+    (code) => {
+      topbar.classList.remove('is-searching');
+      searchOpen.setAttribute('aria-expanded', 'false');
+      select(code, { fly: true, focus: true });
+    },
   );
 
   document.getElementById('zoom-in').addEventListener('click', mapApi.zoomIn);
@@ -159,15 +163,74 @@ async function start() {
     document.getElementById('sidebar').classList.toggle('is-open', open);
   });
 
+  // Phones: no sliders. The shop / round choice moves to the top bar, above the map.
+  const phone = matchMedia('(max-width: 720px)');
+  const modeEl = document.getElementById('mode');
+  const placeMode = () => {
+    if (phone.matches) document.getElementById('topbar').append(modeEl);
+    else document.getElementById('delivery-body').before(modeEl);
+  };
+  phone.addEventListener('change', placeMode);
+  placeMode();
+  document.getElementById('mobile-reset').addEventListener('click', () => {
+    state.filters = {};
+    recompute();
+  });
+
+  const legend = document.getElementById('legend');
+  const legendToggle = document.getElementById('legend-toggle');
+  if (phone.matches) {
+    legendToggle.setAttribute('aria-expanded', 'false');
+    legend.classList.add('is-collapsed');
+  }
+  legendToggle.addEventListener('click', () => {
+    const open = legendToggle.getAttribute('aria-expanded') !== 'true';
+    legendToggle.setAttribute('aria-expanded', String(open));
+    legend.classList.toggle('is-collapsed', !open);
+  });
+
+  const topbar = document.getElementById('topbar');
+  const searchOpen = document.getElementById('search-open');
+  const searchInput = document.getElementById('search');
+  searchOpen.addEventListener('click', () => {
+    const open = !topbar.classList.contains('is-searching');
+    topbar.classList.toggle('is-searching', open);
+    searchOpen.setAttribute('aria-expanded', String(open));
+    if (open) searchInput.focus();
+  });
+
+  // "Around me": asked only when the button is pressed; the position never leaves the browser.
+  const locate = document.getElementById('locate');
+  locate.addEventListener('click', () => {
+    if (!navigator.geolocation) return;
+    locate.setAttribute('aria-busy', 'true');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        locate.removeAttribute('aria-busy');
+        mapApi.around(pos.coords.latitude, pos.coords.longitude, 100);
+      },
+      () => {
+        locate.removeAttribute('aria-busy');
+        status.textContent = t['locate.error'];
+        setTimeout(() => (status.textContent = ''), 4000);
+      },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 },
+    );
+  });
+
+  showNotice();
+
   // ---------- delivery mode ----------
-  const dlvSwitch = document.getElementById('delivery');
+  const modeShop = document.getElementById('mode-shop');
+  const modeRound = document.getElementById('mode-round');
   const dlvBody = document.getElementById('delivery-body');
   const coverKm = document.getElementById('cover-km');
   const coverN = document.getElementById('cover-n');
   const slider = document.getElementById('cover-slider');
 
   function syncDeliveryControls() {
-    dlvSwitch.checked = dlv.on;
+    modeShop.setAttribute('aria-pressed', String(!dlv.on));
+    modeRound.setAttribute('aria-pressed', String(dlv.on));
     dlvBody.hidden = !dlv.on;
     document.querySelector('.filters').hidden = dlv.on;
     document.getElementById('filters-off').hidden = !dlv.on;
@@ -230,11 +293,15 @@ async function start() {
     ].join('');
   }
 
-  dlvSwitch.addEventListener('change', () => {
-    dlv.on = dlvSwitch.checked;
-    syncDeliveryControls();
-    recompute();
-  });
+  for (const [btn, on] of [[modeShop, false], [modeRound, true]]) {
+    btn.addEventListener('click', () => {
+      if (dlv.on === on) return;
+      dlv.on = on;
+      syncDeliveryControls();
+      if (on && dlv.base) setBase(dlv.base);
+      else recompute();
+    });
+  }
   for (const [btn, cover] of [[coverKm, 'km'], [coverN, 'n']]) {
     btn.addEventListener('click', () => {
       dlv.cover = cover;
@@ -448,6 +515,8 @@ async function start() {
     }
     const topEmpty = dlv.on && !national && visible.length > MAX_RANKED ? t['delivery.zoomToRank'] : t['top.empty'];
     sidebar.update({ ranges: visibleRanges(visible), inView: visible.length, topTitle, topItems, topEmpty });
+    document.getElementById('sheet-title').textContent = dlv.on && !national ? t['mobile.sheetRound'] : t['mobile.sheet'];
+    document.getElementById('mobile-filters').hidden = dlv.on || !Object.keys(state.filters).length;
   }
 
   /** Communes on screen ranked by inhabitants without a bakery that a bakehouse there would serve. */
@@ -486,6 +555,32 @@ async function start() {
   else recompute();
   if (state.sel) select(state.sel, { fly: !sharedPosition });
   status.textContent = '';
+}
+
+/** First visit: what the scores are and are not. Dismissal is remembered in this browser only. */
+function showNotice() {
+  const KEY = 'fournyl.notice';
+  let seen = false;
+  try {
+    seen = localStorage.getItem(KEY) === '1';
+  } catch {
+    /* storage blocked: show the notice every time */
+  }
+  if (seen) return;
+  const notice = document.getElementById('notice');
+  notice.hidden = false;
+  document.getElementById('notice-ok').addEventListener('click', () => {
+    notice.hidden = true;
+    try {
+      localStorage.setItem(KEY, '1');
+    } catch {
+      /* ignore */
+    }
+  });
+}
+
+if ('serviceWorker' in navigator && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+  navigator.serviceWorker.register(`${siteRoot()}sw.js`).catch(() => {});
 }
 
 start().catch((err) => {

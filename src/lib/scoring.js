@@ -36,18 +36,19 @@ export function score(pct, weights) {
 export const category = (s) => (s == null ? 'unknown' : s >= 60 ? 'go' : s >= 40 ? 'maybe' : 'avoid');
 
 export const BIN_COLOURS = {
-  top: '#4D9221', // ≥ 75
-  go: '#7FBC41', // 60–74
-  maybe: '#ECEAE1', // 40–59
-  avoid: '#DE77AE', // 25–39
-  worst: '#C51B7D', // < 25
-  out: '#D9D2C5', // filtered out
-  unknown: '#D9D2C5',
+  // Blue <-> kraft diverging scale (docs/DESIGN.md): colour-blind safe, no red/green. Avoid bins are also hatched.
+  top: '#1E3F8A', // ≥ 75
+  go: '#6A8BCB', // 60–74
+  maybe: '#EAE6DC', // 40–59
+  avoid: '#D2B98E', // 25–39
+  worst: '#A9844F', // < 25
+  out: '#F7F5F0', // filtered out
+  unknown: '#F7F5F0',
   // Delivery mode (docs/SPEC.md §3.3)
-  d_open: '#4D9221', // in range, no bakery: opportunity
-  d_has: '#D9CEBB', // in range, already has a bakery
-  d_out: '#F7F4EE', // outside the range
-  d_base: '#5B3A12', // the bakehouse
+  d_open: '#1E3F8A', // in range, no bakery: opportunity
+  d_has: '#D8CDB6', // in range, already has a bakery
+  d_out: '#F7F5F0', // outside the range
+  d_base: '#1C1A17', // the bakehouse
 };
 
 export const bin = (s) =>

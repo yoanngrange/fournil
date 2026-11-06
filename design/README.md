@@ -12,7 +12,10 @@ layout, copy, inline styles and the logic in their `<script type="text/x-dc">` b
 | `Commune.dc.html` | Commune page (Clisson, 44043) — long scrolling page |
 | `logic-reference.js` | Clean versions of the scoring, filter and delivery algorithms |
 
-## Tokens
+## Tokens (superseded)
+
+> **Nov 2026:** the V1 identity replaces these tokens. See `docs/DESIGN.md` and `src/styles.css`.
+> The values below are kept to read the mockups.
 
 **Fonts:** Fraunces (display, 500/700) · Public Sans (UI, 400–700). Both on Google Fonts; self-host in production.
 

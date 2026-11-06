@@ -77,6 +77,16 @@ Start every milestone on Loire-Atlantique (44), then generalise.
 - Monthly scheduled pipeline, data vintage shown in the UI, shortlist + compare (up to 3),
   empty/error states, French copy review.
 
+## V1 — Public launch on fournyl.com (Nov 2026)
+- Brand **Fournyl** and design system (`docs/DESIGN.md`): flour paper, ink, one red, blue ↔ kraft map scale.
+- Phones: map-first, no sliders, shop / round switch kept, "around me", commune details on their own page.
+- PWA (manifest, icons, service worker). First-visit notice and disclaimers on the map and commune pages.
+- One "Infos légales" page: terms and data limits, legal notice (publisher: association Vraie Forêt),
+  privacy, data updates (dates of every source, next build, build checks).
+- Operations (`docs/OPERATIONS.md`): Cloudflare Web Analytics, weekly traffic email, daily monitoring,
+  build failure alerts, custom domain.
+- Still to do from M7: shortlist page + compare up to 3, French copy review.
+
 ## Later (paid version and partners)
 Accounts · Stripe · PDF market study for banks · bakeries-for-sale alerts · opt-in broker / miller leads ·
 communes looking for a baker (listings) · van-tour route planning (OSRM / OpenRouteService) ·
