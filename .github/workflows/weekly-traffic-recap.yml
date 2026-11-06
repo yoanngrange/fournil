@@ -51,6 +51,6 @@ jobs:
           REPORT_EMAIL_TO: 'yoann.grange@gmail.com'
           REPORT_EMAIL_FROM: 'fournyl.com Reports <fournyl-reports@yoanngrange.com>'
           SITE_NAME: 'fournyl.com'
-          META_URL: ${{ vars.SITE_URL || 'https://yoanngrange.github.io/fournil/' }}data/meta.json
+          META_URL: ${{ vars.SITE_URL || 'https://fournyl.com/' }}data/meta.json
           PERIOD_START: ${{ github.event.inputs.period_start }}
         run: python3 scripts/weekly_traffic_recap.py
