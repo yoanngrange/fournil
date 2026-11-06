@@ -4,6 +4,7 @@
 @font-face { font-family: 'Atkinson Hyperlegible'; font-weight: 700; font-display: swap; src: url('../fonts/atkinson-hyperlegible-latin-700-normal.woff2') format('woff2'); }
 @font-face { font-family: 'Big Shoulders Display'; font-weight: 600; font-display: swap; src: url('../fonts/big-shoulders-display-latin-600-normal.woff2') format('woff2'); }
 @font-face { font-family: 'Big Shoulders Display'; font-weight: 800; font-display: swap; src: url('../fonts/big-shoulders-display-latin-800-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Coustard'; font-weight: 900; font-display: swap; src: url('../fonts/coustard-latin-900-normal.woff2') format('woff2'); }
 @font-face { font-family: 'Courier Prime'; font-weight: 400; font-display: swap; src: url('../fonts/courier-prime-latin-400-normal.woff2') format('woff2'); }
 @font-face { font-family: 'Courier Prime'; font-weight: 700; font-display: swap; src: url('../fonts/courier-prime-latin-700-normal.woff2') format('woff2'); }
 
@@ -33,7 +34,7 @@
   --line-soft: 1px solid var(--rule-soft);
   --lift: 4px 4px 0 var(--ink);     /* hard offset: floating sheets on the map, never blurred */
   --font-ui: 'Atkinson Hyperlegible', system-ui, sans-serif;
-  --font-brand: 'Coustard', /* Google Fonts, linked in each page's <head> */ Rockwell, 'Roboto Slab', Georgia, serif;
+  --font-brand: 'Coustard', Rockwell, 'Roboto Slab', Georgia, serif;
   --font-display: 'Big Shoulders Display', 'Arial Narrow', sans-serif-condensed, sans-serif;
   --font-num: 'Courier Prime', 'Courier New', ui-monospace, monospace;
 }
