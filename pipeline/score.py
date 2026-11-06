@@ -3,7 +3,14 @@
 import numpy as np
 import pandas as pd
 
-from pipeline.config import CRITERIA, LOWER_IS_BETTER, NO_BAKERY_BOOST, NO_BAKERY_BOOST_FROM, NO_BAKERY_BOOST_FULL
+from pipeline.config import (
+    CRITERIA,
+    LOWER_IS_BETTER,
+    NO_BAKERY_BOOST,
+    NO_BAKERY_BOOST_FROM,
+    NO_BAKERY_BOOST_FULL,
+    SMALL_COMMUNE_K,
+)
 
 
 def criteria(df: pd.DataFrame) -> pd.DataFrame:
@@ -55,7 +62,14 @@ def percentiles(raw: pd.DataFrame, df: pd.DataFrame) -> pd.DataFrame:
         out[c] = 1000 - out[c]
     for c in CRITERIA:
         _check(ranked[c], out[c], c, inverted=c in LOWER_IS_BETTER)
+    for c, k in SMALL_COMMUNE_K.items():
+        out[c] = (500 + reliability(df["pop"], k) * (out[c] - 500)).round()
     return out
+
+
+def reliability(pop: pd.Series, k: float) -> pd.Series:
+    """0..1 weight of a commune's own rank: pop / (pop + k). 0.5 at k inhabitants."""
+    return pop / (pop + k)
 
 
 def _check(values: pd.Series, pct: pd.Series, name: str, inverted: bool) -> None:
