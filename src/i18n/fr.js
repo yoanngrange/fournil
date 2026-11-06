@@ -1,7 +1,6 @@
 // All UI strings (French). Keys are grouped by screen; keep an English twin possible.
 export default {
   'app.name': 'Fournyl',
-  'app.badge': 'Bêta',
   'app.home': 'Fournyl, accueil',
   'app.intro':
     'Où ouvrir ou reprendre votre boulangerie ? Chaque commune est notée sur 100 par rapport à toute la France.',

@@ -19,8 +19,8 @@
   --ink-3: #6B6255;        /* captions, sources (5.1:1 on paper) */
   --rule-soft: #DCD3C2;    /* hairlines inside a sheet */
   /* Brand */
-  --rouge: #B42318;        /* the strong colour: brand mark, stamps, the one thing to look at. Never map data. */
-  --rouge-deep: #8C1B12;
+  --rouge: #FF0000;        /* the strong colour: brand mark, stamps, the one thing to look at. Never map data. */
+  --rouge-deep: #C00000;
   --bleu: #1E3F8A;         /* bleu de travail: links, focus, and Go on the map */
   --bleu-deep: #142C63;
   --kraft: #D2B98E;        /* kraft: Avoid on the map, quiet fills */
@@ -63,10 +63,6 @@ button { font: inherit; }
 .brand-name {
   margin: 0; font-family: var(--font-brand); font-weight: 900; font-size: 30px; line-height: 1;
   letter-spacing: -0.01em;
-}
-.badge {
-  font-family: var(--font-num); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-  padding: 3px 7px; border: 1.5px solid var(--rouge); color: var(--rouge); transform: rotate(-3deg);
 }
 
 /* ---------- Sidebar ---------- */
@@ -523,8 +519,15 @@ body.page { height: auto; background: var(--paper); }
 .pg-bar-track { height: 10px; background: var(--paper-3); }
 .pg-bar-track i { display: block; height: 10px; background: var(--ink); }
 .pg-why { margin: 10px 0; }
-.pg-why-head { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; margin-bottom: 4px; }
+.pg-why-head { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 4px 12px; font-size: 14px; margin-bottom: 4px; }
 .pg-why-head small { color: var(--ink-3); }
+.pg-why-label small { white-space: nowrap; }
+/* Rank in big figures; the criterion's weight in small caps under it: present, never competing. */
+.pg-why-rank { display: grid; justify-items: end; text-align: right; white-space: nowrap; }
+.pg-why-rank b { font-family: var(--font-num); font-size: 18px; line-height: 1; }
+.pg-why-rank small { font-family: var(--font-num); font-size: 12px; }
+.pg-why-weight { font-family: var(--font-num); font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+.pg-why-na { font-size: 13px; color: var(--ink-3); }
 .pg-chart { width: 100%; height: auto; display: block; }
 .pg-chart text { font-size: 11px; fill: var(--ink-3); font-family: var(--font-num); }
 .pg-chart .grid { stroke: var(--rule-soft); }

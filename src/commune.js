@@ -52,8 +52,11 @@ function why(p) {
       const rank = crit.pct == null ? null : Math.round(crit.pct / 10);
       const value = c.key === 'per_bakery' && !p.bakeries ? t['page.why.noBakery'] : fmtCriterion(c.key, crit.v);
       return `<div class="pg-why">
-        <div class="pg-why-head"><span>${t[`crit.${c.key}`]} <small>${value}</small></span>
-          <span>${rank == null ? t['card.notPublished'] : `${rank} / 100`} · ${tr('card.weight', { w: t[`weight.${c.weight}`] })}</span></div>
+        <div class="pg-why-head">
+          <span class="pg-why-label">${t[`crit.${c.key}`]} <small>${value}</small></span>
+          <span class="pg-why-rank">${rank == null ? `<span class="pg-why-na">${t['card.notPublished']}</span>` : `<span><b>${rank}</b><small> / 100</small></span>`}
+            <span class="pg-why-weight">${tr('card.weight', { w: t[`weight.${c.weight}`] })}</span></span>
+        </div>
         <div class="pg-bar-track"><i style="width:${rank ?? 0}%"></i></div>
       </div>`;
     })
@@ -259,7 +262,7 @@ async function locator(el, p) {
           id: 'fill',
           type: 'fill',
           source: 'c',
-          paint: { 'fill-color': ['match', ['get', 'kind'], 'here', '#B42318', 'without', '#9BB0DA', '#DCD3C2'] },
+          paint: { 'fill-color': ['match', ['get', 'kind'], 'here', '#FF0000', 'without', '#9BB0DA', '#DCD3C2'] },
         },
         { id: 'line', type: 'line', source: 'c', paint: { 'line-color': '#FAF6EC', 'line-width': 1.2 } },
       ],
@@ -286,7 +289,7 @@ const postcodes = (list = []) =>
 const IGN_PLAN =
   'https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2' +
   '&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png';
-const KIND_COLOURS = { bakery: '#B42318', pastry: '#E08A5A', bake_off: '#1E3F8A', retail: '#8A8172' };
+const KIND_COLOURS = { bakery: '#FF0000', pastry: '#E08A5A', bake_off: '#1E3F8A', retail: '#8A8172' };
 
 function breadList(p) {
   if (!p.bread_points.length) return `<p class="pg-muted">${t['page.bread.none']}</p>`;
@@ -432,7 +435,7 @@ async function start() {
       <figure class="pg-locator">
         <div class="pg-locator-map" id="locator" role="img" aria-label="${esc(t['page.locator'])}"></div>
         <figcaption>
-          <span><i style="background:#B42318"></i>${t['page.locator.here']}</span>
+          <span><i style="background:#FF0000"></i>${t['page.locator.here']}</span>
           <span><i style="background:#DCD3C2"></i>${t['page.locator.with']}</span>
           <span><i style="background:#9BB0DA"></i>${t['page.locator.without']}</span>
         </figcaption>
