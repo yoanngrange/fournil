@@ -8,14 +8,20 @@
   <meta name="description" content="{{description}}">
   <link rel="canonical" href="{{canonical}}">
   <meta name="fournil-commune" content="{{code}}">
-  <link rel="preload" href="fonts/public-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <meta name="theme-color" content="#B42318">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+  <link rel="preload" href="fonts/atkinson-hyperlegible-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/big-shoulders-display-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="vendor/maplibre-gl-6.11.2/maplibre-gl.css">
   <link rel="stylesheet" href="src/styles.css">
   <script type="module" src="src/commune.js"></script>
+  {{analytics}}
 </head>
 <body class="page">
   <header class="page-top">
-    <a class="page-brand" href="./">Fournil</a>
+    <a class="page-brand" href="./"><img src="img/mark.svg" alt="" width="32" height="32">Fournyl</a>
     <nav class="page-crumbs" aria-label="{{t_breadcrumb}}">
       <a href="./">{{t_france}}</a><span aria-hidden="true">›</span><a href="{{dep_path}}">{{dep_name}}</a><span aria-hidden="true">›</span><span aria-current="page">{{name}}</span>
     </nav>
@@ -24,5 +30,6 @@
     <h1 class="page-title">{{name}}</h1>
     <p class="page-lead">{{description}}</p>
   </main>
+  {{footer}}
 </body>
 </html>

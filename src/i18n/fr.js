@@ -1,7 +1,8 @@
 // All UI strings (French). Keys are grouped by screen; keep an English twin possible.
 export default {
-  'app.name': 'Fournil',
-  'app.badge': 'Prototype',
+  'app.name': 'Fournyl',
+  'app.badge': 'Bêta',
+  'app.home': 'Fournyl, accueil',
   'app.intro':
     'Où ouvrir ou reprendre votre boulangerie ? Chaque commune est notée sur 100 par rapport à toute la France.',
   'app.loading': 'Chargement des données…',
@@ -23,13 +24,19 @@ export default {
   'counts.avoid.one': '{n} défavorable',
   'counts.out': '{n} hors filtres',
 
+  'locate.label': 'Centrer la carte autour de moi',
+  'locate.error': 'Position indisponible : autorisez la localisation dans votre navigateur, ou cherchez une commune.',
   'search.label': 'Rechercher une commune',
   'search.placeholder': 'Rechercher une commune…',
   'search.none': 'Aucune commune trouvée',
   'search.results': '{n} résultats',
 
-  'delivery.title': 'Boulangerie mobile ou livraison',
-  'delivery.hint': 'Servir plusieurs villages depuis un fournil : camion, marchés, tournées.',
+  'mode.title': 'Votre projet',
+  'mode.shop': 'En boutique',
+  'mode.shopHint': 'Une boulangerie dans une commune',
+  'mode.round': 'En tournée',
+  'mode.roundHint': 'Un fournil qui livre plusieurs villages',
+  'delivery.title': 'Zone de tournée',
   'delivery.coverLabel': 'Définir la zone par',
   'delivery.byDistance': 'Distance',
   'delivery.byNeighbours': 'Communes voisines',
@@ -61,6 +68,13 @@ export default {
   'tip.depNob': '{n} communes sans boulangerie',
   'tip.noBakery': 'Aucune boulangerie',
   'tip.bakeries': '{n} boulangerie(s)',
+  'mobile.sheet': 'Meilleures communes',
+  'mobile.sheetRound': 'Meilleurs emplacements',
+  'mobile.filtersActive': 'Des filtres venant d’un lien partagé sont actifs.',
+  'notice.title': 'Avant de commencer',
+  'notice.text': 'Les notes sont calculées à partir de <b>données publiques</b> qui ont souvent un à trois ans de retard sur la réalité. Elles aident à repérer des communes à étudier ; elles ne remplacent ni une visite sur place, ni une étude de marché, ni l’avis d’un conseiller.',
+  'notice.ok': 'J’ai compris',
+  'notice.more': 'Conditions d’utilisation',
   'filters.title': 'Filtres',
   'filters.reset': 'Réinitialiser',
   'filters.help':
@@ -267,6 +281,8 @@ export default {
   'page.bread.none': 'Aucun point de vente de pain à moins de 5 km.',
   'page.bread.attribution': '© IGN – Plan IGN',
   'page.sources': 'Sources : Insee (populations légales et recensement {census}, Filosofi {income}, BPE {bpe}), Sirene ({sirene}), BODACC, ministère de l’Intérieur (SSMSI {crime}, municipales {election}, Répertoire national des élus), IGN Admin Express. ',
+  'page.disclaimer': 'Fiche calculée le {built} à partir de données publiques, dont certaines ont plusieurs années de retard. Elle aide à préparer une visite, sans la remplacer : vérifiez sur place la concurrence, les loyers et le passage, et faites valider votre projet par un conseiller (chambre de métiers, banque, expert-comptable). <a href="infos-legales/#conditions">Conditions d’utilisation</a> · <a href="infos-legales/#donnees">Mises à jour des données</a>',
+  'footer.text': 'Fournyl est un outil indépendant d’aide à la décision, fondé sur des données publiques. Il ne garantit ni l’exactitude ni l’actualité des chiffres.',
   'svc.primary_schools': 'Écoles',
   'svc.secondary_schools': 'Collèges et lycées',
   'svc.pharmacies': 'Pharmacies',
@@ -284,27 +300,30 @@ export default {
   'sector.other': 'Autres',
 
   // Generated pages (pipeline/pages.py reads these single-line entries; keep each on one line).
-  'seo.home.title': 'Fournil — où ouvrir ou reprendre une boulangerie en France',
-  'seo.dep.title': 'Ouvrir ou reprendre une boulangerie en {dep} ({code}) — Fournil',
+  'seo.home.title': 'Fournyl — où ouvrir ou reprendre une boulangerie en France',
+  'seo.dep.title': 'Ouvrir ou reprendre une boulangerie en {dep} ({code}) — Fournyl',
   'seo.dep.description': 'Les {n} communes de {dep} notées pour ouvrir ou reprendre une boulangerie : habitants par boulangerie, revenus, démographie et concurrence.',
-  'seo.commune.title': '{name} ({code}) : ouvrir ou reprendre une boulangerie — Fournil',
+  'seo.commune.title': '{name} ({code}) : ouvrir ou reprendre une boulangerie — Fournyl',
   'seo.commune.description': '{name} ({dep}) : {pop} habitants, {bakeries}, revenu médian {income}. Concurrence, reprises, prix des fonds, démographie et économie locale.',
   'seo.bakeries.none': 'aucune boulangerie',
   'seo.bakeries.one': '1 boulangerie',
   'seo.bakeries.many': '{n} boulangeries',
   'seo.income.none': 'non diffusé',
-  'seo.notFound.title': 'Page introuvable — Fournil',
+  'seo.notFound.title': 'Page introuvable — Fournyl',
   'seo.notFound.text': 'Cette page n’existe pas ou a changé d’adresse.',
   'seo.notFound.redirect': 'Redirection…',
   'seo.backHome': 'Retour à la carte de France',
 
   'sources.link': 'Sources et méthode',
+  'updates.link': 'Mises à jour des données',
+  'legal.link': 'Infos légales',
+  'legal.short': 'Données publiques, parfois anciennes de plusieurs années : à vérifier sur place avant toute décision.',
 
   // Sources & method page (public/sources/). Long-form copy: HTML allowed, numbers filled from meta.json.
   'sources.title': 'Sources et méthode',
   'sources.back': '← Retour à la carte',
   'sources.intro':
-    'Fournil n’utilise que des données publiques. Cette page explique comment la note est calculée, les choix que nous avons faits et les limites à garder en tête avant de décider.',
+    'Fournyl n’utilise que des données publiques. Cette page explique comment la note est calculée, les choix que nous avons faits et les limites à garder en tête avant de décider.',
   'sources.how.title': 'Comment la note est calculée',
   'sources.how': [
     'Pour chaque critère, la commune est <b>classée parmi toutes les communes de France métropolitaine et de Corse</b> (environ 34 700). Le rang va de 0 (la moins bonne) à 100 (la meilleure).',
@@ -350,4 +369,195 @@ export default {
   'sources.list.fetched': 'Téléchargé le',
   'sources.footer':
     'Données réutilisées sous Licence Ouverte 2.0 (Etalab). Géographie : code officiel géographique {cog}. Données mises à jour le {built}.',
+
+  // ---------- Legal and update pages (src/doc.js, src/updates.js). HTML allowed. ----------
+  'contact.email': 'vraie.foret@gmail.com',
+  'doc.updated': 'Texte mis à jour le {updated}.',
+  'legal.title': 'Infos légales',
+  'legal.intro': 'Tout ce qu’il faut savoir avant d’utiliser Fournyl : les limites des données, qui édite le site, ce qui se passe avec vos données et la date de chaque source.',
+  'legal.nav': 'Sur cette page',
+
+  'doc.legal': {
+    id: 'mentions',
+    title: 'Mentions légales',
+    updated: '2026-11-06',
+    intro: 'Informations prévues par la loi pour la confiance dans l’économie numérique (LCEN, article 6).',
+    sections: [
+      {
+        title: 'Éditeur',
+        paras: [
+          'Le site <b>fournyl.com</b> est édité par l’association <b>Vraie Forêt</b>, association loi 1901 basée en Loire-Atlantique, RNA W442030253 (<a href="https://vraieforet.com">vraieforet.com</a>). Le site est gratuit et sans publicité.',
+          'Directeur de la publication : Yoann Grange.',
+          'Contact : <a href="mailto:{contact}">{contact}</a>.',
+        ],
+      },
+      {
+        title: 'Hébergement',
+        paras: [
+          'GitHub Inc. (service GitHub Pages), 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis — <a href="https://github.com">github.com</a>.',
+          'Nom de domaine enregistré auprès d’OVH SAS, 2 rue Kellermann, 59100 Roubaix, France.',
+        ],
+      },
+      {
+        title: 'Nature du service',
+        paras: [
+          'Fournyl est un outil gratuit d’aide à la décision. Il calcule, pour chaque commune de France métropolitaine et de Corse, une note destinée aux boulangers qui cherchent où ouvrir ou reprendre une boulangerie. Les notes et les chiffres reposent uniquement sur des données publiques ; ils ne constituent ni un conseil financier, juridique ou en investissement, ni une étude de marché. Voir les <a href="#conditions">conditions d’utilisation</a>.',
+        ],
+      },
+      {
+        title: 'Données réutilisées et licences',
+        paras: [
+          'Les données affichées sont des <b>informations publiques réutilisées</b> conformément au code des relations entre le public et l’administration (articles L. 321-1 et suivants). Chaque chiffre est accompagné de sa source et de son année ; la liste complète est sur la page <a href="sources/">Sources et méthode</a>.',
+          '<ul><li><b>Insee</b> (recensement, populations légales, Filosofi, Base permanente des équipements, Sirene, code officiel géographique), <b>IGN</b> (Admin Express, Plan IGN), <b>ministère de l’Intérieur</b> (SSMSI, élections, Répertoire national des élus), <b>DILA</b> (BODACC) : Licence Ouverte 2.0 (Etalab).</li><li><b>Wikidata</b> : CC0. <b>Photos Wikimedia Commons</b> : licence et auteur indiqués sur chaque photo.</li><li>Les données ont pu être recalculées (rangs, taux, médianes) ; ces traitements sont décrits sur la page Sources et méthode et n’engagent pas les producteurs, qui ne cautionnent pas Fournyl.</li></ul>',
+        ],
+      },
+      {
+        title: 'Propriété intellectuelle',
+        paras: [
+          'Le nom Fournyl, le logo, la charte graphique et les textes du site sont la propriété de l’association Vraie Forêt. Les calculs (notes et classements) peuvent être cités avec la mention « Source : Fournyl, d’après [producteur des données] ».',
+          'Logiciels et polices : MapLibre GL JS (licence BSD), Atkinson Hyperlegible, Big Shoulders Display et Courier Prime (SIL Open Font License).',
+        ],
+      },
+      {
+        title: 'Signaler une erreur ou demander une correction',
+        paras: [
+          'Une donnée vous semble fausse, ou vous êtes cité sur le site (maire, entreprise) et souhaitez une rectification ? Écrivez à <a href="mailto:{contact}">{contact}</a> en indiquant la commune concernée. Les chiffres venant des producteurs publics ne sont corrigés qu’à la source ; nous vous indiquerons à qui vous adresser.',
+        ],
+      },
+    ],
+  },
+
+  'doc.privacy': {
+    id: 'confidentialite',
+    title: 'Confidentialité',
+    updated: '2026-11-06',
+    intro: 'Fournyl ne demande aucun compte, ne dépose aucun cookie et ne vend aucune donnée. Voici exactement ce qui se passe quand vous utilisez le site.',
+    sections: [
+      {
+        title: 'Ce qui reste dans votre navigateur',
+        paras: [
+          'Votre <b>sélection de communes</b> (étoile) et le fait d’avoir fermé le message d’accueil sont enregistrés dans le stockage local de votre navigateur (« localStorage »). Ils ne quittent jamais votre appareil et ne nous sont pas transmis. Vous pouvez les effacer à tout moment en supprimant les données du site dans votre navigateur.',
+          'Si vous installez Fournyl comme application, une copie des pages et des données déjà consultées est gardée dans le cache du navigateur pour fonctionner hors connexion.',
+        ],
+      },
+      {
+        title: 'Mesure d’audience',
+        paras: [
+          'Nous comptons les visites avec <b>Cloudflare Web Analytics</b>, sans cookie ni identifiant : l’outil ne suit pas un visiteur d’une page à l’autre ni d’un site à l’autre et ne produit que des totaux (pages vues, pays, type d’appareil, site d’origine). Ces totaux servent uniquement à savoir quelles pages sont utiles. Cloudflare, Inc. (États-Unis) agit comme sous-traitant ; les transferts sont encadrés par le cadre de protection des données UE–États-Unis. Base légale : intérêt légitime (article 6.1.f du RGPD).',
+        ],
+      },
+      {
+        title: 'Hébergement et services tiers',
+        paras: [
+          'Comme tout serveur web, <b>GitHub Pages</b> reçoit votre adresse IP pour vous envoyer les pages et peut la conserver brièvement dans ses journaux, pour la sécurité du service (<a href="https://docs.github.com/fr/site-policy/privacy-policies/github-general-privacy-statement">déclaration de confidentialité de GitHub</a>).',
+          'Sur les fiches communes, la photo est chargée depuis <b>Wikimedia Commons</b> et la carte des points de vente depuis les serveurs de l’<b>IGN</b> : votre navigateur contacte directement ces services publics, qui voient donc votre adresse IP.',
+        ],
+      },
+      {
+        title: 'Personnes citées dans les données',
+        paras: [
+          'Les fiches affichent le nom du maire (Répertoire national des élus) et le nom de sociétés de 10 salariés ou plus (Sirene). Les entrepreneurs individuels et les entreprises qui ont demandé à ne pas être diffusées ne sont jamais nommés.',
+          'Le futur indicateur « boulangeries à reprendre bientôt » n’utilisera que des <b>nombres par commune</b> : aucune boulangerie ni aucune personne ne sera jamais signalée individuellement.',
+          'Vous pouvez vous opposer à l’affichage de votre nom ou demander une rectification en écrivant à <a href="mailto:{contact}">{contact}</a>.',
+        ],
+      },
+      {
+        title: 'Vos droits',
+        paras: [
+          'Vous disposez des droits d’accès, de rectification, d’effacement, d’opposition et de limitation prévus par le RGPD. Écrivez à <a href="mailto:{contact}">{contact}</a> ; nous répondons sous un mois. Vous pouvez aussi saisir la <a href="https://www.cnil.fr/fr/plaintes">CNIL</a>.',
+        ],
+      },
+    ],
+  },
+
+  'doc.terms': {
+    id: 'conditions',
+    title: 'Conditions d’utilisation',
+    updated: '2026-11-06',
+    intro: 'Fournyl est gratuit et accessible sans inscription. En l’utilisant, vous acceptez les conditions ci-dessous, en particulier les limites des données.',
+    callout: [
+      '<b>En bref.</b> Les notes sont calculées à partir de données publiques qui ont souvent <b>un à trois ans de retard</b> sur la réalité, et ne voient pas tout : loyers, état des boutiques, passage, projets en cours. Fournyl aide à <b>repérer des communes à étudier</b>. Il ne remplace ni une visite sur place, ni une étude de marché, ni l’avis d’un conseiller (chambre de métiers et de l’artisanat, banque, expert-comptable).',
+    ],
+    sections: [
+      {
+        title: 'Objet',
+        paras: [
+          'Fournyl note chaque commune de France métropolitaine et de Corse selon des critères utiles à l’ouverture ou à la reprise d’une boulangerie (habitants par boulangerie, revenus, évolution de la population, délinquance) et présente des chiffres de contexte sur chaque commune.',
+        ],
+      },
+      {
+        title: 'Des données publiques, avec leurs limites',
+        paras: [
+          '<b>Décalage dans le temps.</b> Chaque source a son propre millésime : le recensement, par exemple, décrit la population de plusieurs années avant sa publication. Une boulangerie peut avoir ouvert ou fermé depuis. Les dates de chaque source sont dans la partie <a href="#donnees">Mises à jour des données</a>.',
+          '<b>Données manquantes.</b> Pour protéger le secret statistique, les producteurs ne publient pas certains chiffres sur les petites communes. Ils sont affichés « non diffusé » et retirés de la note de la commune, qui repose alors sur moins de critères.',
+          '<b>Approximations.</b> Certaines valeurs sont estimées (petits nombres de faits de délinquance, reprises déduites de Sirene, prix médians des fonds). Les choix de calcul et leurs biais sont décrits sur la page <a href="sources/">Sources et méthode</a>.',
+          '<b>Une méthode, pas une vérité.</b> La note est un classement relatif construit par Fournyl avec des poids que nous avons choisis. Ce n’est ni un indicateur officiel, ni une prévision de chiffre d’affaires, ni une évaluation du prix d’une entreprise.',
+        ],
+      },
+      {
+        title: 'Votre responsabilité',
+        paras: [
+          'Les informations sont fournies à titre indicatif. Toute décision (achat d’un fonds, signature d’un bail, emprunt, installation) relève de votre seule responsabilité et doit s’appuyer sur vos propres vérifications et sur des professionnels.',
+        ],
+      },
+      {
+        title: 'Responsabilité de l’éditeur',
+        paras: [
+          'L’éditeur fait de son mieux pour que les calculs soient justes et le site disponible, sans pouvoir le garantir. Il ne pourra être tenu responsable d’une erreur, d’une omission, d’un retard de mise à jour, d’une interruption du service, ni des conséquences d’une décision prise à partir du site. Les liens vers d’autres sites n’engagent pas l’éditeur.',
+        ],
+      },
+      {
+        title: 'Réutilisation',
+        paras: [
+          'Vous pouvez citer et partager les notes et les fiches en indiquant « Source : Fournyl, d’après [producteur] ». L’aspiration massive et automatisée du site est déconseillée : les données d’origine sont disponibles gratuitement chez leurs producteurs (voir Sources et méthode).',
+        ],
+      },
+      {
+        title: 'Évolution et droit applicable',
+        paras: [
+          'Ces conditions peuvent évoluer ; la date de mise à jour figure en bas de page. Elles sont soumises au droit français. Une question ? <a href="mailto:{contact}">{contact}</a>.',
+        ],
+      },
+    ],
+  },
+
+  'updates.title': 'Mises à jour des données',
+  'updates.nav': 'Mises à jour',
+  'updates.intro': 'Fournyl recalcule toutes les notes une fois par mois, le 3 au matin, après la publication mensuelle du répertoire Sirene. Chaque source garde son propre rythme : un chiffre récemment téléchargé peut décrire une année ancienne.',
+  'updates.built': 'Dernier calcul',
+  'updates.next': 'Prochain calcul prévu',
+  'updates.communes': 'Communes notées',
+  'updates.oldest': 'Millésime le plus ancien',
+  'updates.table': 'Source par source',
+  'updates.col.source': 'Données',
+  'updates.col.vintage': 'Millésime',
+  'updates.col.published': 'Publié par le producteur',
+  'updates.col.fetched': 'Téléchargé par Fournyl',
+  'updates.col.rhythm': 'Rythme du producteur',
+  'updates.checks': 'Contrôles du dernier calcul',
+  'updates.check.pop': 'Population totale : <b>{total}</b> habitants, pour {official} dans les populations légales (écart {gap}).',
+  'updates.check.bakeries': 'Boulangeries : <b>{bpe}</b> dans la BPE, {sirene} établissements actifs dans Sirene (écart {gap}).',
+  'updates.check.missing': 'Données non diffusées : revenu pour {income} des communes, délinquance pour {crime}.',
+  'updates.unknown': 'non indiqué',
+  'updates.late': 'Le dernier calcul date de plus de 40 jours : la mise à jour mensuelle a pu échouer. Les chiffres restent valables mais ne sont peut-être pas les plus récents.',
+  'updates.rhythm': {
+    cog: 'annuel (janvier)',
+    cog_mvt: 'annuel (janvier)',
+    admin_express_communes: 'annuel',
+    admin_express_chefs_lieux: 'annuel',
+    admin_express_departements: 'annuel',
+    populations: 'annuel (fin décembre)',
+    rp_history: 'annuel (été)',
+    rp_age_sex: 'annuel (été)',
+    filosofi: 'annuel',
+    bpe: 'annuel',
+    ssmsi: 'annuel (été)',
+    bodacc: 'quotidien',
+    sirene_ul: 'mensuel (1er du mois)',
+    sirene: 'mensuel (1er du mois)',
+    elus_maires: 'en continu',
+    municipales_t1: 'à chaque élection',
+    municipales_t2: 'à chaque élection',
+    wikidata: 'en continu',
+  },
 };

@@ -1,5 +1,6 @@
 // Sources & method page: long-form copy from fr.js, source list and figures from data/meta.json.
 import t from './i18n/fr.js';
+import { addChrome } from './lib/chrome.js';
 
 const pct = (x) => `${(100 * x).toFixed(1).replace('.', ',')} %`;
 const date = (iso) => (iso ? new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '—');
@@ -11,7 +12,7 @@ function list(id, items, params) {
 }
 
 async function start() {
-  const meta = await fetch('../data/meta.json').then((r) => r.json());
+  const meta = await fetch('data/meta.json').then((r) => r.json());
   const params = {
     census: meta.years.census,
     growthFrom: meta.years.growth_from,
@@ -22,7 +23,6 @@ async function start() {
     built: date(meta.built_at),
   };
 
-  el('back').textContent = t['sources.back'];
   el('title').textContent = t['sources.title'];
   el('intro').textContent = t['sources.intro'];
   for (const k of ['how', 'choices', 'bias']) {
@@ -49,7 +49,8 @@ async function start() {
     }
     body.append(tr);
   }
-  el('footer').textContent = fill(t['sources.footer'], params);
+  el('footer').innerHTML = `${fill(t['sources.footer'], params)} <a href="infos-legales/#donnees">${t['updates.link']}</a>`;
+  addChrome();
 }
 
 start();

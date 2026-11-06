@@ -72,7 +72,7 @@ Criteria (MVP):
 | `crime` | Taux de délinquance | offences /1,000 | lower | Low (1), on by default |
 | `sell_soon` | Boulangeries à reprendre bientôt | count | higher | Low (1) — High in takeover preset |
 
-### 3.3 Delivery mode (switch "Boulangerie mobile ou livraison")
+### 3.3 Delivery mode (project switch "En boutique | En tournée")
 - User clicks a commune to place the **bakehouse** (marked with a dark pin).
 - Segmented control **Distance | Communes voisines**:
   - Distance: slider 5–30 km; all communes whose centroid is within that distance (dashed circle drawn).
@@ -113,6 +113,7 @@ Pages artifact and **never committed** to git (a monthly refresh would otherwise
 | Département (map centred on it) | `/loire-atlantique/` |
 | Commune page | `/loire-atlantique/clisson-44043/` |
 | Sources & method | `/sources/` |
+| Infos légales (terms and data limits, legal notice, privacy, data updates) | `/infos-legales/` (anchors `#conditions`, `#mentions`, `#confidentialite`, `#donnees`) |
 Slug = lower case, accents removed, anything else → `-` (`pipeline/pages.py` and `src/lib/slug.js`, kept identical
 by a test). The INSEE code is what the site reads; a wrong or old slug, or `/commune/<code>`, is redirected by
 `404.html`. The map keeps its state in the query string and `#carte=zoom/lat/lon`; the path follows the
@@ -155,15 +156,22 @@ Kept up to date with every milestone that adds or changes a criterion.
 - **Search:** commune name autocomplete (accent-insensitive, handles "Saint" / "St"), jumps map + opens card.
 - **URL state:** view, filters, weights, mode, selected commune encoded in the query string → shareable links.
 - **Shortlist:** star from card or page, stored in `localStorage`, simple list + compare up to 3 (stretch).
-- **Responsive:** on phones, sidebar becomes a bottom sheet; card becomes a full-screen sheet.
+- **Responsive (V1, Nov 2026):** on phones (≤ 720 px) the map is the interface: no sliders or weights
+  (filters from a shared link still apply, with a "Réinitialiser" link). Top bar: mark, search behind an icon,
+  "around me" (geolocation asked only on tap, ~100 km across), and the *En boutique / En tournée* switch.
+  Bottom sheet: ranking, plus the delivery settings in round mode. Selecting a commune shows a strip
+  (name, score, link); the details open on the commune page (a real, shareable URL), not a full-screen sheet.
+- **PWA:** installable (`manifest.webmanifest`), service worker `sw.js`: app shell cached per build,
+  data and pages network-first with a cache of the last ~120 files viewed (all of France is ~250 MB).
+- **First visit notice:** what the scores are and are not, dismissed once per browser (localStorage).
 
 ## 6. Non-functional
 - First load < 2 s on 4G for the national view (national file ≤ 300 kB gzipped).
 - Commune geometry loaded per département on demand.
-- Works offline-ish after first load is a nice-to-have, not required.
+- Works offline after first load for the app and what was already viewed (PWA, see §5).
 
 ## 7. Open questions (ask Yoann before building these)
-1. Product name and domain (Fournil is a working name).
+1. ~~Product name and domain~~ **Decided (Nov 2026):** Fournyl, fournyl.com.
 2. Start with 3 onboarding questions (model, where, type of place) or go straight to the map with presets?
    *For the prototype: straight to the map with the "New opening" preset.*
 3. Takeover and new opening as presets of one score, or two separate scores?

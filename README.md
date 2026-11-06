@@ -43,4 +43,4 @@ uv run python scripts/serve.py             # http://localhost:8000/
 ```
 
 The site is plain HTML/CSS/JS (no build step). `scripts/build_site.sh` assembles `public/` + `src/`
-into `_site/`, which the GitHub Action deploys to https://yoanngrange.github.io/fournil/ on every push to `main`.
+into `_site/`, which the GitHub Action deploys to GitHub Pages on every push to `main` (see `docs/OPERATIONS.md`).
