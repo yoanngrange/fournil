@@ -422,6 +422,31 @@ body.doc { height: auto; background: var(--paper); }
 .legal-part { scroll-margin-top: 56px; }
 .legal-part .doc-intro { margin-bottom: 4px; }
 
+/* Ma sélection */
+.sel-list { list-style: none; padding: 0; margin: 8px 0 0; border: var(--line); background: var(--paper-2); display: block; }
+.sel-list li { display: grid; grid-template-columns: 24px 14px minmax(0, 1fr) auto 44px; align-items: center; gap: 10px; padding: 6px 4px 6px 12px; border-bottom: var(--line-soft); }
+.sel-list li:last-child { border-bottom: 0; }
+.sel-list input { width: 20px; height: 20px; accent-color: var(--ink); margin: 0; }
+.sel-list a { font-weight: 700; }
+.sel-list small { grid-column: 3; grid-row: 2; margin-top: -4px; color: var(--ink-3); font-size: 12px; }
+.sel-list b { grid-column: 4; grid-row: 1 / span 2; font-size: 20px; }
+.sel-remove { grid-column: 5; grid-row: 1 / span 2; width: 40px; height: 40px; border: var(--line); background: transparent; font-size: 20px; cursor: pointer; }
+.sel-remove:hover { background: var(--paper-3); }
+.doc .sel-list { padding: 0; gap: 0; }
+.doc .sel-table th[scope="row"] { border-bottom: var(--line-soft); position: sticky; left: 0; background: var(--paper-2); z-index: 1; border-right: var(--line-soft); }
+.sel-table { min-width: 0 !important; }
+@media (max-width: 520px) {
+  .sel-table .best-tag { display: block; width: max-content; margin-top: 3px; }
+  .sel-table th, .sel-table td { padding: 8px 8px; }
+  .sel-table thead th a { font-size: 17px; }
+}
+.sel-table th[scope="row"] { font-family: var(--font-ui); font-size: 13px; letter-spacing: 0; text-transform: none; color: var(--ink); font-weight: 700; }
+.sel-table thead th a { font-family: var(--font-display); font-size: 20px; letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink); }
+.sel-table thead th small { font-family: var(--font-ui); text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--ink-3); }
+.sel-table td { font-family: var(--font-num); }
+.sel-table td.is-best { font-weight: 700; background: #EEF1F7; }
+.best-tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 0 4px; border: 1px solid var(--bleu); color: var(--bleu); }
+
 /* ---------- Commune page ---------- */
 body.page { height: auto; background: var(--paper); }
 .page-top {

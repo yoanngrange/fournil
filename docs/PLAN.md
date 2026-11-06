@@ -85,7 +85,8 @@ Start every milestone on Loire-Atlantique (44), then generalise.
   privacy, data updates (dates of every source, next build, build checks).
 - Operations (`docs/OPERATIONS.md`): Cloudflare Web Analytics, weekly traffic email, daily monitoring,
   build failure alerts, custom domain.
-- Still to do from M7: shortlist page + compare up to 3, French copy review.
+- Shortlist page `/ma-selection/` (starred communes, compare up to 3 with the best value marked).
+- Still to do from M7: French copy review.
 
 ## Later (paid version and partners)
 Accounts · Stripe · PDF market study for banks · bakeries-for-sale alerts · opt-in broker / miller leads ·

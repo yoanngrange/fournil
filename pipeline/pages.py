@@ -60,9 +60,9 @@ def analytics_tag(token: str | None = None) -> str:
 
 
 # Text pages copied from public/ that carry the <!-- analytics --> marker.
-STATIC_PAGES = ["index.html", "sources/index.html", "infos-legales/index.html"]
+STATIC_PAGES = ["index.html", "sources/index.html", "infos-legales/index.html", "ma-selection/index.html"]
 # Footer links (mirror of LINKS in src/lib/chrome.js): href, fr.js key.
-FOOTER_LINKS = [("sources/", "sources.link"), ("infos-legales/#donnees", "updates.link"), ("infos-legales/", "legal.link")]
+FOOTER_LINKS = [("ma-selection/", "sel.link"), ("sources/", "sources.link"), ("infos-legales/#donnees", "updates.link"), ("infos-legales/", "legal.link")]
 
 
 def _fill(template: str, **params) -> str:
