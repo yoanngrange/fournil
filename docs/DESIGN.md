@@ -7,7 +7,7 @@ shadows, gradients, purple). Tokens live in `src/styles.css` (`:root`); this fil
 ## Principles
 
 1. **Ink on paper.** Content sits on paper, separated by ink rules, not by shadows or rounded boxes.
-2. **One strong colour.** Red (`--rouge`) is the brand: the mark, the rule under the logo, the "Bêta" stamp,
+2. **One strong colour.** Red (`--rouge`) is the brand: the mark, the rule under the logo,
    the shortlist star, the callout edge. It never encodes data, so the map can never be read as "red = bad".
 3. **The map is calm.** Data colours are a blue ↔ kraft scale (no red/green, no "Christmas tree").
    Blue = favourable, kraft = unfavourable *and hatched*, warm grey = neutral. Colour-blind safe.
@@ -26,7 +26,7 @@ shadows, gradients, purple). Tokens live in `src/styles.css` (`:root`); this fil
 | `--ink-2` | `#4A4339` | Secondary text, labels | 8.9:1 |
 | `--ink-3` | `#6B6255` | Captions, sources | 5.4:1 |
 | `--rule-soft` | `#DCD3C2` | Hairlines inside a sheet | decorative |
-| `--rouge` | `#B42318` | Brand only (see principle 2) | 6.3:1 |
+| `--rouge` | `#FF0000` | Brand only (see principle 2). Never for text: 3.8:1 on paper, below the 4.5:1 text threshold (fine for shapes, ≥ 3:1) | 3.8:1 |
 | `--bleu` | `#1E3F8A` | Links, focus ring, Go text | 9:1 |
 | `--kraft` | `#D2B98E` | Avoid fill (always hatched) | decorative |
 
@@ -75,7 +75,7 @@ All four are SIL OFL, self-hosted in `public/fonts/` (Latin subset, ~130 kB tota
 
 ## Mark
 
-`public/img/mark.svg` (drawn by Yoann): a red rounded tile (`#FF0004`) with a white "f" whose crossbar is a
+`public/img/mark.svg` (drawn by Yoann): a red rounded tile (`#FF0000`) with a white "f" whose crossbar is a
 baguette with three scoring cuts (*grignes*). The same file is the favicon and the app icon (`icon-*.png`;
 `icon-maskable-512.png` puts it at 70 % on a full red square for Android's safe zone). Wordmark: "Fournyl" in
 Coustard 900.
