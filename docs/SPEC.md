@@ -155,7 +155,9 @@ Kept up to date with every milestone that adds or changes a criterion.
 ## 5. Other MVP features
 - **Search:** commune name autocomplete (accent-insensitive, handles "Saint" / "St"), jumps map + opens card.
 - **URL state:** view, filters, weights, mode, selected commune encoded in the query string → shareable links.
-- **Shortlist:** star from card or page, stored in `localStorage`, simple list + compare up to 3 (stretch).
+- **Shortlist:** star from card or page, stored in `localStorage`. Page `/ma-selection/` (noindex): the list,
+  remove, tick up to 3 communes to compare score, inhabitants, growth, bakeries, inhabitants per bakery, income
+  and crime; the most favourable value per row is marked "meilleur" (text + bold, not colour alone).
 - **Responsive (V1, Nov 2026):** on phones (≤ 720 px) the map is the interface: no sliders or weights
   (filters from a shared link still apply, with a "Réinitialiser" link). Top bar: mark, search behind an icon,
   "around me" (geolocation asked only on tap, ~100 km across), and the *En boutique / En tournée* switch.

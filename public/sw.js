@@ -18,6 +18,7 @@ const SHELL_FILES = [
   'src/commune.js',
   'src/sources.js',
   'src/legal.js',
+  'src/selection.js',
   'src/notfound.js',
   'src/i18n/fr.js',
   'src/lib/chrome.js',

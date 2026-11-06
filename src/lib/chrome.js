@@ -3,6 +3,7 @@
 import t from '../i18n/fr.js';
 
 export const LINKS = [
+  ['ma-selection/', 'sel.link'],
   ['sources/', 'sources.link'],
   ['infos-legales/#donnees', 'updates.link'],
   ['infos-legales/', 'legal.link'],
