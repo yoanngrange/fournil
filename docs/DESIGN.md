@@ -50,7 +50,7 @@ Hatch: 2 px lines of `#4A3414` at 60 %, 45°, every 6–7 px (CSS `--hatch`, Map
 
 | Role | Font | Where |
 |---|---|---|
-| Brand | **Coustard** 900, mixed case, −0.01 em | The wordmark "Fournyl" only |
+| Brand | **Coustard** 400 (Regular), mixed case | The wordmark "Fournyl" only |
 | Display | **Big Shoulders Display** 800, uppercase, +0.02–0.04 em | Page and commune titles, card name, section titles |
 | Text | **Atkinson Hyperlegible** 400/700 | Everything else (designed for low-vision readers) |
 | Figures and labels | **Courier Prime** 400/700 | Numbers, the "label" style (12 px caps, +0.08 em) for section labels and table heads |
@@ -78,7 +78,7 @@ All four are SIL OFL, self-hosted in `public/fonts/` (Latin subset, ~130 kB tota
 `public/img/mark.svg` (drawn by Yoann): a red rounded tile (`#FF0000`) with a white "f" whose crossbar is a
 baguette with three scoring cuts (*grignes*). The same file is the favicon and the app icon (`icon-*.png`;
 `icon-maskable-512.png` puts it at 70 % on a full red square for Android's safe zone). Wordmark: "Fournyl" in
-Coustard 900.
+Coustard Regular (400; the Black 900 looked too much like Rockwell).
 
 ## Layout
 
