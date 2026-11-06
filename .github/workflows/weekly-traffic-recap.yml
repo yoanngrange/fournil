@@ -1,0 +1,56 @@
+name: Weekly traffic recap
+
+on:
+  # GitHub Actions cron is UTC-only and has no DST awareness, so 08:00
+  # Europe/Paris needs two entries — one per UTC offset — plus the
+  # "Check DST-correct trigger" step below picks the right one and skips
+  # the other.
+  schedule:
+    - cron: '0 6 * * 1' # Monday 08:00 CEST (UTC+2, ~late March-late October)
+    - cron: '0 7 * * 1' # Monday 08:00 CET  (UTC+1, ~late October-late March)
+  workflow_dispatch: # manual "Run workflow" button, always proceeds
+    inputs:
+      period_start:
+        description: 'Optional: ISO8601 UTC start of a custom period (e.g. 2026-09-20T22:00:00Z) instead of the default last-7-days'
+        required: false
+        type: string
+
+jobs:
+  recap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check DST-correct trigger
+        id: check
+        run: |
+          offset=$(TZ='Europe/Paris' date +%z)
+          proceed=false
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            proceed=true
+          elif [ "${{ github.event.schedule }}" = "0 6 * * 1" ] && [ "$offset" = "+0200" ]; then
+            proceed=true
+          elif [ "${{ github.event.schedule }}" = "0 7 * * 1" ] && [ "$offset" = "+0100" ]; then
+            proceed=true
+          fi
+          if [ -z "${{ vars.CF_SITE_TAG }}" ]; then
+            echo "::warning::Repository variable CF_SITE_TAG is not set yet (docs/OPERATIONS.md): no recap."
+            proceed=false
+          fi
+          echo "proceed=$proceed" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout
+        if: steps.check.outputs.proceed == 'true'
+        uses: actions/checkout@v4
+
+      - name: Send weekly traffic recap
+        if: steps.check.outputs.proceed == 'true'
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: '153303233ced3d9f02ed7d8345a10ed9'
+          CF_SITE_TAG: ${{ vars.CF_SITE_TAG }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          REPORT_EMAIL_TO: 'yoann.grange@gmail.com'
+          REPORT_EMAIL_FROM: 'fournyl.com Reports <fournyl-reports@yoanngrange.com>'
+          SITE_NAME: 'fournyl.com'
+          META_URL: ${{ vars.SITE_URL || 'https://yoanngrange.github.io/fournil/' }}data/meta.json
+          PERIOD_START: ${{ github.event.inputs.period_start }}
+        run: python3 scripts/weekly_traffic_recap.py

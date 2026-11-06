@@ -1,0 +1,26 @@
+; Zone fournyl.com — GitHub Pages (apex + www). For OVH: Web Cloud > Domaines > fournyl.com >
+; Zone DNS > "Modifier en mode textuel". Keep OVH's own SOA and NS lines as they are; replace or add
+; the records below, and delete any existing A / AAAA / CNAME on @ and www (OVH parking page).
+
+$TTL 3600
+
+; Apex -> GitHub Pages (https://docs.github.com/pages/configuring-a-custom-domain-for-your-github-pages-site)
+@        IN A      185.199.108.153
+@        IN A      185.199.109.153
+@        IN A      185.199.110.153
+@        IN A      185.199.111.153
+@        IN AAAA   2606:50c0:8000::153
+@        IN AAAA   2606:50c0:8001::153
+@        IN AAAA   2606:50c0:8002::153
+@        IN AAAA   2606:50c0:8003::153
+
+; www -> redirects to the apex once Pages has the custom domain
+www      IN CNAME  yoanngrange.github.io.
+
+; Domain verification (protects against takeover). Get the exact name and value from
+; GitHub > Settings (your account) > Pages > Verified domains > Add a domain > fournyl.com.
+; _github-pages-challenge-yoanngrange  IN TXT  "<value given by GitHub>"
+
+; No mail on this domain: tell receivers so nobody can send mail as @fournyl.com.
+@        IN TXT    "v=spf1 -all"
+_dmarc   IN TXT    "v=DMARC1; p=reject"
