@@ -5,6 +5,7 @@ on:
     branches: [main]
   schedule:
     - cron: "0 5 3 * *" # monthly, after the SIRENE stock is republished on the 1st
+    - cron: "0 5 8 * *" # second chance: Insee sometimes publishes a stock file a few days late (Nov 2026)
   workflow_dispatch:
 
 permissions:
@@ -43,6 +44,8 @@ jobs:
         run: uv run pytest -q
 
       - name: Assemble site
+        env:
+          CF_BEACON_TOKEN: ${{ vars.CF_BEACON_TOKEN }} # Cloudflare Web Analytics; empty = no analytics tag
         run: bash scripts/build_site.sh
 
       - uses: actions/configure-pages@v5
@@ -59,3 +62,23 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  # Any failure (a source renamed or late, a data test failing, the deploy) emails Yoann.
+  notify-failure:
+    needs: [build, deploy]
+    if: failure()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Email the failure
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        run: |
+          if [ -z "$RESEND_API_KEY" ]; then echo "RESEND_API_KEY not set, skipping"; exit 0; fi
+          python3 scripts/notify.py "[fournyl.com] Data build failed (${{ github.event_name }})" \
+            "The build-and-deploy workflow failed. The site keeps serving the previous data.
+
+          Trigger: ${{ github.event_name }}
+          Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          If a source was not published yet, the run on the 8th retries; otherwise re-run it by hand once fixed."
