@@ -277,6 +277,10 @@ async function locator(el, p) {
   });
 }
 
+/** Every postcode of the commune (Nantes has four); the INSEE code is never shown. */
+const postcodes = (list = []) =>
+  list.length > 1 ? tr('cp.list', { list: list.join(', ') }) : list.length ? tr('cp.one', { cp: list[0] }) : '';
+
 // ---------- points of sale of bread (IGN street map) ----------
 
 const IGN_PLAN =
@@ -296,18 +300,43 @@ function breadList(p) {
   return `<ul class="pg-points">${rows}</ul>`;
 }
 
+const BREAD_RADIUS_KM = 5; // same radius as the pipeline (build_local.BREAD_RADIUS_M)
+
+/** A circle of radius km around [lon, lat], as a GeoJSON polygon (equirectangular approximation). */
+function disc(lon, lat, km, steps = 96) {
+  const dLat = km / 111.32;
+  const dLon = km / (111.32 * Math.cos((lat * Math.PI) / 180));
+  const ring = Array.from({ length: steps + 1 }, (_, i) => {
+    const a = (2 * Math.PI * i) / steps;
+    return [lon + dLon * Math.cos(a), lat + dLat * Math.sin(a)];
+  });
+  return { type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [ring] } };
+}
+
 function breadMap(el, p) {
   if (!p.bread_points.length) return;
+  const area = disc(p.lon, p.lat, BREAD_RADIUS_KM);
+  const ring = area.geometry.coordinates[0];
+  const lons = ring.map((c) => c[0]);
+  const lats = ring.map((c) => c[1]);
   const map = new maplibregl.Map({
     container: el,
-    center: [p.lon, p.lat],
-    zoom: 13.5,
+    bounds: [[Math.min(...lons), Math.min(...lats)], [Math.max(...lons), Math.max(...lats)]],
+    fitBoundsOptions: { padding: 16 },
     cooperativeGestures: true, // the page keeps scrolling; ctrl/two fingers to move the map
     attributionControl: { compact: true, customAttribution: t['page.bread.attribution'] },
     style: {
       version: 8,
-      sources: { plan: { type: 'raster', tiles: [IGN_PLAN], tileSize: 256, maxzoom: 18 } },
-      layers: [{ id: 'plan', type: 'raster', source: 'plan' }],
+      sources: {
+        plan: { type: 'raster', tiles: [IGN_PLAN], tileSize: 256, maxzoom: 18 },
+        area: { type: 'geojson', data: area },
+      },
+      layers: [
+        { id: 'plan', type: 'raster', source: 'plan' },
+        // The 5 km search area of the list beside the map.
+        { id: 'area-fill', type: 'fill', source: 'area', paint: { 'fill-color': '#1E3F8A', 'fill-opacity': 0.25 } },
+        { id: 'area-line', type: 'line', source: 'area', paint: { 'line-color': '#1E3F8A', 'line-width': 2 } },
+      ],
     },
   });
   map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
@@ -379,7 +408,7 @@ async function start() {
     <div class="pg-hero">
       <div class="pg-hero-text">
         <h1 class="page-title">${esc(p.name)}</h1>
-        <p class="pg-muted">${tr('page.meta', { code: p.code, dep: esc(p.dep_name) })}</p>
+        <p class="pg-muted">${[postcodes(p.postcodes), esc(p.dep_name)].filter(Boolean).join(' · ')}</p>
         <div class="pg-score">
           <span class="swatch ${cat === 'avoid' ? 'is-hatched' : ''}" style="background:${BIN_COLOURS[bin(s)]}"></span>
           <b>${s ?? '–'}</b><span>${s == null ? t['cat.unknown'] : tr('card.outOf', { cat: t[`cat.${cat}`] })}</span>

@@ -2,7 +2,7 @@
 // Everything comes from data/communes-index.json; the list lives in localStorage only.
 import t from './i18n/fr.js';
 import { BIN_COLOURS, WEIGHTS, bin, category, score } from './lib/scoring.js';
-import { fmtCriterion, fmtInt, fmtSigned, tr } from './lib/format.js';
+import { fmtCriterion, fmtInt, fmtPostcode, fmtSigned, tr } from './lib/format.js';
 import { readShortlist, toggleShortlist } from './lib/shortlist.js';
 import { communePath } from './lib/slug.js';
 import { addChrome } from './lib/chrome.js';
@@ -39,7 +39,7 @@ async function start() {
       pct[k] = index.pct[k][i];
     }
     const s = score(pct, WEIGHTS);
-    return { code, name: index.name[i], dep: index.dep[i], depName: depNames[index.dep[i]], pop: index.pop[i], bakeries: index.bakeries[i], v, score: s, cat: category(s), fill: BIN_COLOURS[bin(s)] };
+    return { code, cp: index.cp?.[i] ?? '', name: index.name[i], dep: index.dep[i], depName: depNames[index.dep[i]], pop: index.pop[i], bakeries: index.bakeries[i], v, score: s, cat: category(s), fill: BIN_COLOURS[bin(s)] };
   };
 
   const main = document.querySelector('main');
@@ -68,7 +68,7 @@ async function start() {
             <label for="cmp-${c.code}" class="visually-hidden">${tr('sel.compareOne', { name: esc(c.name) })}</label>
             ${swatch(c)}
             <a href="${communePath(c.depName, c.name, c.code)}">${esc(c.name)}</a>
-            <small>${esc(c.depName)}</small>
+            <small>${[fmtPostcode(c.cp), esc(c.depName)].filter(Boolean).join(' · ')}</small>
             <b class="num">${c.score ?? '–'}</b>
             <button type="button" class="sel-remove" data-code="${c.code}" aria-label="${tr('sel.remove', { name: esc(c.name) })}">×</button>
           </li>`,

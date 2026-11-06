@@ -32,7 +32,7 @@ function rows(index) {
       v[k] = index.v[k][i];
       pct[k] = index.pct[k][i];
     }
-    return { code, name: index.name[i], dep: index.dep[i], lat: index.lat[i], lon: index.lon[i], pop: index.pop[i], bakeries: index.bakeries[i], v, pct };
+    return { code, cp: index.cp?.[i] ?? '', name: index.name[i], dep: index.dep[i], lat: index.lat[i], lon: index.lon[i], pop: index.pop[i], bakeries: index.bakeries[i], v, pct };
   });
 }
 

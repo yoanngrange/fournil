@@ -68,6 +68,15 @@ SOURCES = {
         "licence": "Licence Ouverte 2.0",
         "page": "https://geoservices.ign.fr/adminexpress",
     },
+    "codes_postaux": {
+        "name": "Base officielle des codes postaux",
+        "producer": "La Poste",
+        "vintage": "2026",
+        "datagouv": {"dataset": "base-officielle-des-codes-postaux", "title_startswith": "Fichier csv", "format": "csv"},
+        "suffix": ".csv",
+        "licence": "Licence Ouverte 2.0",
+        "page": "https://www.data.gouv.fr/datasets/base-officielle-des-codes-postaux",
+    },
     "populations": {
         "name": "Populations de référence (populations légales)",
         "producer": "Insee",

@@ -50,30 +50,35 @@ Hatch: 2 px lines of `#4A3414` at 60 %, 45°, every 6–7 px (CSS `--hatch`, Map
 
 | Role | Font | Where |
 |---|---|---|
-| Display | **Big Shoulders Display** 800, uppercase, +0.02–0.04 em | Logo, page and commune titles, card name, section titles |
+| Brand | **Coustard** 900, mixed case, −0.01 em | The wordmark "Fournyl" only |
+| Display | **Big Shoulders Display** 800, uppercase, +0.02–0.04 em | Page and commune titles, card name, section titles |
 | Text | **Atkinson Hyperlegible** 400/700 | Everything else (designed for low-vision readers) |
 | Figures and labels | **Courier Prime** 400/700 | Numbers, the "label" style (12 px caps, +0.08 em) for section labels and table heads |
 
-All three are SIL OFL, self-hosted in `public/fonts/` (Latin subset, ~100 kB total).
+All four are SIL OFL, self-hosted in `public/fonts/` (Latin subset, ~130 kB total).
 
 ## Components
 
 - **Label** (`.label`, sidebar `h2`, table heads): Courier Prime 12 px caps, `--ink-2`.
 - **Sheet**: `--paper-2`, 1.5 px ink border (`--line`), optional `--lift`.
-- **Segmented control** (`.mode-switch`, `.segmented`): one ink-bordered box, ink dividers; the pressed
-  option is ink with paper text. Used for *En boutique / En tournée* and *Distance / Communes voisines*.
+- **Segmented control** (`.mode-switch`, `.segmented`): one ink-bordered box with a 3 px hard offset (it reads
+  as a physical control), ink dividers. Each option starts with a square radio box: empty = available, box
+  with a dot = chosen (shape, not colour alone); the chosen option is also ink with paper text. Hover underlines
+  the option, press nudges it 1 px. Used for *En boutique / En tournée* and *Distance / Communes voisines*.
 - **Primary button** (`.btn`, `.card-page`, `.pg-button`): ink fill, paper text; hover turns blue.
   Ghost button: transparent with ink border.
 - **Figures grid** (`.kpis`, `.pg-tiles`, `.facts`): a ruled table, label in Courier caps over a large figure.
 - **Callout** (`.callout`): sheet with a 6 px red left edge. For warnings and disclaimers only.
-- **Slider**: ink track, square paper thumbs, value tags in ink with paper text.
+- **Slider**: ink track, value tags in ink with paper text. Thumbs are square handles (22 × 26 px) with three
+  vertical grip ridges and a 2 px hard offset; hover darkens them, dragging presses them flat (`grabbing`).
 - **Focus**: 3 px blue outline, 2 px offset, everywhere.
 
 ## Mark
 
-`public/img/mark.svg`: a red square, a white loaf with three red scoring cuts (*grignes*) and a white
-hearth line (*la sole*). The same drawing is the favicon and the app icon (`icon-*.png`, `icon-maskable-512.png`
-with a safe zone). Wordmark: "FOURNYL" in Big Shoulders Display 800.
+`public/img/mark.svg` (drawn by Yoann): a red rounded tile (`#FF0004`) with a white "f" whose crossbar is a
+baguette with three scoring cuts (*grignes*). The same file is the favicon and the app icon (`icon-*.png`;
+`icon-maskable-512.png` puts it at 70 % on a full red square for Android's safe zone). Wordmark: "Fournyl" in
+Coustard 900.
 
 ## Layout
 

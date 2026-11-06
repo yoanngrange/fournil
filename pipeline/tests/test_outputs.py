@@ -189,3 +189,18 @@ def test_bread_points(index):
         for p in pts:
             assert set(p) == {"lat", "lon", "km", "kind", "name"}
             assert p["kind"] in {"bakery", "pastry", "bake_off", "retail"} and p["km"] <= 5.0
+
+
+def test_postcodes(index):
+    """Postcodes are display data: five digits, sorted, known for (almost) every commune."""
+    cps = dict(zip(index["code"], index["cp"]))
+    assert len(index["cp"]) == len(index["code"])
+    known = [cp for cp in cps.values() if cp]
+    assert len(known) >= 0.99 * len(cps)
+    for cp in known:
+        parts = cp.split()
+        assert parts == sorted(set(parts)) and all(len(p) == 5 and p.isdigit() for p in parts)
+    if "44043" in cps:  # Clisson
+        assert cps["44043"] == "44190"
+    if "44109" in cps:  # Nantes has several
+        assert cps["44109"].split()[0] == "44000" and len(cps["44109"].split()) > 1
