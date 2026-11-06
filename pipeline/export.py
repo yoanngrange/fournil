@@ -86,6 +86,7 @@ def index(df: pd.DataFrame, centres: pd.DataFrame, raw: pd.DataFrame, pct: pd.Da
         "code": list(df.index),
         "name": list(df["name"]),
         "dep": list(df["dep"]),
+        "cp": [cp if isinstance(cp, str) else "" for cp in df["postcodes"]],  # space-separated, "" if unknown
         "lat": _round(centres.lat, 3),
         "lon": _round(centres.lon, 3),
         "pop": _round(df["pop"], 0),
@@ -109,6 +110,7 @@ def commune_page(
         "name": row["name"],
         "dep": row["dep"],
         "dep_name": dep_names.get(row["dep"]),
+        "postcodes": row["postcodes"].split() if isinstance(row["postcodes"], str) else [],
         "lat": round(float(centres.lat[code]), 5),
         "lon": round(float(centres.lon[code]), 5),
         "pop": int(row["pop"]),

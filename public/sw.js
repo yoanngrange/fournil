@@ -35,6 +35,7 @@ const SHELL_FILES = [
   'fonts/atkinson-hyperlegible-latin-400-normal.woff2',
   'fonts/atkinson-hyperlegible-latin-700-normal.woff2',
   'fonts/big-shoulders-display-latin-800-normal.woff2',
+  'fonts/coustard-latin-900-normal.woff2',
   'fonts/courier-prime-latin-400-normal.woff2',
   'fonts/courier-prime-latin-700-normal.woff2',
   'data/meta.json',

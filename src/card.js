@@ -1,6 +1,6 @@
 // Pinned commune card on the map: score and the four key figures, then a link to the full commune page.
 import t from './i18n/fr.js';
-import { fmtCriterion, fmtInt, tr } from './lib/format.js';
+import { fmtCriterion, fmtInt, fmtPostcode, tr } from './lib/format.js';
 import { readShortlist, toggleShortlist } from './lib/shortlist.js';
 import { communePath } from './lib/slug.js';
 
@@ -28,7 +28,7 @@ export function createCard(root, { onClose, meta }) {
       <div class="card-head">
         <div>
           <h2 class="card-name" id="card-title" tabindex="-1">${esc(c.name)}</h2>
-          <div class="card-muted">${tr('card.meta', { code: c.code, dep: esc(view.depName) })}</div>
+          <div class="card-muted">${[fmtPostcode(c.cp), esc(view.depName)].filter(Boolean).join(' · ')}</div>
         </div>
         <button type="button" class="card-close" aria-label="${t['card.close']}">×</button>
       </div>

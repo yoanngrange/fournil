@@ -41,6 +41,7 @@ Items marked **VERIFY** were not confirmed when this guide was written; check th
 | Mayor | **Répertoire national des élus**, maires file (Ministère de l'Intérieur) | Only first name and surname are exported; birth date and occupation in the file are never used. |
 | Municipal election 2026 | Ministère de l'Intérieur, results per commune, round 1 (15 March) and round 2 (22 March) | Turnout (% votants), each list's full name, nuance and % of valid votes. Mayor's list = the list with the most council seats in the deciding round. Nuances exist mostly above 3,500 inhabitants. Candidate names are not in the commune file and are not used. |
 | Points of sale of bread (commune page map) | **SIRENE** establishments with Lambert-93 coordinates, NAF 10.71C (boulangerie), 10.71D (pâtisserie), 10.71B (terminal de cuisson), 47.24Z (dépôt de pain) | Within 5 km of the town hall, nearest 300 at most. Publicly released establishments only; name = shop sign, usual name, or company name for legal entities, never a sole trader's name. Basemap: IGN Plan IGN v2 WMTS (data.geopf.fr, Licence Ouverte, no key). Supermarket in-store bakeries are not in SIRENE as bakeries. |
+| Postcodes (display only) | **La Poste**, *Base officielle des codes postaux* (data.gouv.fr, CSV, Latin-1) | Shown instead of the INSEE code (card, search, commune page, shortlist); search also accepts a postcode or its first digits. The INSEE code stays the key in data and URLs. A commune can have several postcodes (Nantes: 4); arrondissements of Paris, Lyon, Marseille and merged communes are folded into their current commune. |
 | Tourism (optional) | INSEE tourist accommodation capacity by commune | Beds in hotels/campsites; later. |
 | Not available nationally | market days, foot traffic, commercial rents | Keep in the backlog. |
 
@@ -66,7 +67,8 @@ CI: GitHub Action monthly (SIRENE changes monthly; other sources yearly) → bui
 meta.json                    { cog_year, built_at, sources: [{id, name, vintage, url, licence}] }
 departements.geojson         simplified boundaries + {code, name, n_communes}
 communes-index.json          one row per commune, compact columnar JSON (~35k rows):
-                               code, name, dep, lat, lon, pop, bakeries,
+                               code, name, dep, cp, lat, lon, pop, bakeries,
+                               cp: postcodes, space-separated, sorted ("" if unknown)
                                v:   {per_bakery, income, growth, crime, sell_soon}   // raw values, null if missing
                                pct: {per_bakery, income, growth, crime, sell_soon}   // 0..1000 ints, already inverted where lower is better
 geo/{dep}.geojson            commune polygons for one département (loaded on zoom)

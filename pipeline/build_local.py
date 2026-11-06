@@ -1,4 +1,4 @@
-"""Local context per commune: size of businesses and main employers (SIRENE), mayor and 2026 election.
+"""Local context per commune: postcodes (La Poste), size of businesses and main employers (SIRENE), mayor and 2026 election.
 
 Main employers are companies or public bodies only (never a sole trader, whose name is a person's),
 and only establishments that agreed to public release in SIRENE.
@@ -216,3 +216,18 @@ def bread_points(centres: pd.DataFrame) -> dict:
             for r in g.head(BREAD_MAX_POINTS).itertuples()
         ]
     return out
+
+
+def postcodes(codes: set[str]) -> pd.Series:
+    """Per commune: its postcodes, sorted and space-separated (e.g. Nantes "44000 44100 44200 44300").
+
+    Display only: the INSEE code stays the key everywhere. The arrondissements of Paris, Lyon and
+    Marseille and merged communes are folded into their current commune.
+    """
+    cp = pd.read_csv(fetch.path("codes_postaux"), sep=";", dtype=str, encoding="latin-1", usecols=[0, 2])
+    cp.columns = ["code", "cp"]
+    mapping = cog.code_mapping()
+    cp["code"] = cp["code"].map(lambda c: c if c in codes else mapping.get(c, c))
+    cp = cp[cp["code"].isin(codes) & cp["cp"].str.fullmatch(r"\d{5}")]
+    return cp.drop_duplicates().groupby("code")["cp"].agg(lambda s: " ".join(sorted(s))).rename("postcodes")
+

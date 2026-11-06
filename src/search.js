@@ -5,7 +5,7 @@ import { normalise, tr } from './lib/format.js';
 const MAX_RESULTS = 8;
 
 export function createSearch(input, listbox, status, communes, onPick) {
-  const items = communes.map((c) => ({ c, key: normalise(c.name) }));
+  const items = communes.map((c) => ({ c, key: normalise(c.name), cps: (c.cp || '').split(' ') }));
   let results = [];
   let active = -1;
 
@@ -25,7 +25,7 @@ export function createSearch(input, listbox, status, communes, onPick) {
       li.setAttribute('aria-selected', String(i === active));
       li.innerHTML = '<span></span><small></small>';
       li.firstChild.textContent = c.name;
-      li.lastChild.textContent = c.code;
+      li.lastChild.textContent = results[i].hit || c.cp.split(' ')[0] || '';
       li.addEventListener('mousedown', (e) => {
         e.preventDefault();
         choose(i);
@@ -64,8 +64,12 @@ export function createSearch(input, listbox, status, communes, onPick) {
     }
     const starts = [];
     const contains = [];
+    const digits = /^\d{2,5}$/.test(q) ? q : null; // a postcode, or its start
     for (const it of items) {
-      if (it.key.startsWith(q)) starts.push(it);
+      if (digits) {
+        const hit = it.cps.find((cp) => cp.startsWith(digits));
+        if (hit) starts.push({ ...it, hit });
+      } else if (it.key.startsWith(q)) starts.push(it);
       else if (it.key.includes(q)) contains.push(it);
     }
     const byPop = (a, b) => b.c.pop - a.c.pop;

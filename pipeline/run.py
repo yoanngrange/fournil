@@ -83,6 +83,7 @@ def main(argv=None):
     sizes, employers = build_local.businesses_by_size(set(df.index))
     df = df.join(sizes)
     politics = build_local.politics(set(df.index))
+    df = df.join(build_local.postcodes(set(df.index)))
 
     print("3/5 scores")
     raw = score.criteria(df)

@@ -44,3 +44,11 @@ export function normalise(s) {
     .replace(/\s+/g, ' ')
     .trim();
 }
+
+/** Postcodes for display ("44000 44100 …" from the index): the first one, plus a count of the others.
+ *  The INSEE code stays the key in URLs and data; it is never shown. */
+export function fmtPostcode(cp) {
+  const all = (cp || '').split(' ').filter(Boolean);
+  if (!all.length) return '';
+  return all.length === 1 ? tr('cp.one', { cp: all[0] }) : tr('cp.more', { cp: all[0], n: all.length - 1 });
+}
