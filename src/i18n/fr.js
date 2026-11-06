@@ -465,6 +465,7 @@ export default {
         paras: [
           'Comme tout serveur web, <b>GitHub Pages</b> reçoit votre adresse IP pour vous envoyer les pages et peut la conserver brièvement dans ses journaux, pour la sécurité du service (<a href="https://docs.github.com/fr/site-policy/privacy-policies/github-general-privacy-statement">déclaration de confidentialité de GitHub</a>).',
           'Sur les fiches communes, la photo est chargée depuis <b>Wikimedia Commons</b> et la carte des points de vente depuis les serveurs de l’<b>IGN</b> : votre navigateur contacte directement ces services publics, qui voient donc votre adresse IP.',
+          'La police du logo (Coustard) est chargée depuis <b>Google Fonts</b> à chaque visite : votre navigateur contacte les serveurs de Google LLC (États-Unis), qui voient votre adresse IP. Aucun cookie n’est déposé (<a href="https://developers.google.com/fonts/faq/privacy?hl=fr">Google Fonts et la confidentialité</a>). Base légale : intérêt légitime (article 6.1.f du RGPD).',
         ],
       },
       {
