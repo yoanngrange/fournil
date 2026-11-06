@@ -274,7 +274,7 @@ export default {
   'page.bread.src': 'Sirene ({sirene}), établissements actifs géolocalisés · fond de carte Plan IGN',
   'page.bread.bakery': 'Boulangerie',
   'page.bread.pastry': 'Pâtisserie',
-  'page.bread.bake_off': 'Terminal de cuisson',
+  'page.bread.bake_off': 'Cuisson de pâte à pain industrielle',
   'page.bread.retail': 'Dépôt de pain',
   'page.bread.townHall': 'Mairie',
   'page.bread.noName': 'Nom non communiqué',

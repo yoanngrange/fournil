@@ -46,7 +46,9 @@ const SHELL_FILES = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(SHELL).then((cache) => cache.addAll(SHELL_FILES.map((f) => new URL(f, self.registration.scope))))
+    // cache: 'reload' skips the HTTP cache (GitHub Pages: max-age 600), so a new shell never mixes in
+    // files from the previous build (e.g. a new stylesheet with an old font list).
+    caches.open(SHELL).then((cache) => cache.addAll(SHELL_FILES.map((f) => new Request(new URL(f, self.registration.scope), { cache: 'reload' }))))
       .then(() => self.skipWaiting()),
   );
 });

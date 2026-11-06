@@ -466,7 +466,9 @@ body.doc { height: auto; background: var(--paper); }
 /* ---------- Commune page ---------- */
 body.page { height: auto; background: var(--paper); }
 .page-top {
-  display: flex; align-items: center; gap: 20px; flex-wrap: wrap; padding: 12px 24px;
+  /* Full-width band; its content lines up with .page-main (max 1180 px, 24 px gutter). */
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  padding: 12px max(24px, calc((100% - 1180px) / 2 + 24px));
   background: var(--paper-2); border-bottom: var(--line);
 }
 .page-brand { display: flex; align-items: center; gap: 8px; font-family: var(--font-brand); font-size: 23px; font-weight: 900; letter-spacing: -0.01em; color: var(--ink); text-decoration: none; }
@@ -572,7 +574,7 @@ body.page { height: auto; background: var(--paper); }
 }
 @media (max-width: 520px) {
   .page-main { padding: 20px 16px 40px; }
-  .page-top { padding: 10px 16px; gap: 6px 14px; }
+  .page-top { padding: 10px max(16px, calc((100% - 1180px) / 2 + 16px)); gap: 6px 14px; }
   .page-title { font-size: 42px; }
   .pg-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .pg-card { padding: 16px 14px; }
