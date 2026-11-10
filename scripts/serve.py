@@ -57,5 +57,5 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 if __name__ == "__main__":
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
     handler = partial(Handler, directory=str(ROOT / "public"))
-    print(f"Fournil on http://localhost:{port}/")
+    print(f"Fournyl on http://localhost:{port}/")
     http.server.ThreadingHTTPServer(("127.0.0.1", port), handler).serve_forever()

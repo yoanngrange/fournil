@@ -1,9 +1,10 @@
 // Communes starred by the user, kept in this browser only (localStorage).
-const KEY = 'fournil.shortlist';
+const KEY = 'fournyl.shortlist';
+const OLD_KEY = 'fournil.shortlist'; // before the Fournyl rename (Nov 2026): still read so nobody loses a list
 
 export function readShortlist() {
   try {
-    return new Set(JSON.parse(localStorage.getItem(KEY) || '[]'));
+    return new Set(JSON.parse(localStorage.getItem(KEY) || localStorage.getItem(OLD_KEY) || '[]'));
   } catch {
     return new Set();
   }

@@ -1,4 +1,4 @@
-# Fournil — build plan
+# Fournyl — build plan
 
 Work milestone by milestone. Finish and demo each one before starting the next.
 Start every milestone on Loire-Atlantique (44), then generalise.

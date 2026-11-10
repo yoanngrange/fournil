@@ -93,7 +93,7 @@ class Site:
             for i, code in enumerate(index["code"])
         }
         self.t = strings()
-        self.root_path = urlparse(SITE_URL).path  # "/fournil/"
+        self.root_path = urlparse(SITE_URL).path  # "/fournyl/"
         self.template = TEMPLATE.read_text(encoding="utf-8")
         self.index_html = (ROOT / "public" / "index.html").read_text(encoding="utf-8")
 
@@ -145,7 +145,7 @@ class Site:
         title = html.escape(_fill(self.t["seo.dep.title"], dep=name, code=dep))
         desc = html.escape(_fill(self.t["seo.dep.description"], dep=name, n=_int(n)), quote=True)
         head = (
-            f'<base href="../">\n  <meta name="fournil-dep" content="{dep}">\n'
+            f'<base href="../">\n  <meta name="fournyl-dep" content="{dep}">\n'
             f'  <link rel="canonical" href="{SITE_URL}{dep_path(name)}">'
         )
         page = self.index_html.replace("<head>", f"<head>\n  {head}", 1).replace("<!-- analytics -->", analytics_tag())

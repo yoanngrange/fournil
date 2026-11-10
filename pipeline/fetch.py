@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from pipeline.config import RAW, SOURCES
 
 MANIFEST = RAW / "manifest.json"
-USER_AGENT = "Mozilla/5.0 (fournil data pipeline)"
+USER_AGENT = "Mozilla/5.0 (fournyl data pipeline)"
 RETRIES = 8
 RETRY_WAIT_S = 10
 

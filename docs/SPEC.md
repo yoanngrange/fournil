@@ -1,10 +1,10 @@
-# Fournil — product spec (v0.1, October 2026)
+# Fournyl — product spec (v0.1, October 2026)
 
 ## 1. Problem and users
 
 A baker who wants to open or take over a bakery has to guess where demand is strong,
 competition is weak and the area is pleasant to live in. The data exists (INSEE, SIRENE, etc.)
-but is scattered and hard to read. Fournil turns it into one map and one page per commune.
+but is scattered and hard to read. Fournyl turns it into one map and one page per commune.
 
 **Primary user:** a baker (newly qualified or experienced) choosing a location, often willing to move.
 **Three bakery models:**

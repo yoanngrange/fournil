@@ -1,6 +1,6 @@
 # Fournyl — project instructions for Claude Code
 
-Fournyl (fournyl.com; the repo and code keep the name `fournil`) helps bakers choose **where in France to open or take over a bakery**.
+Fournyl (fournyl.com; repo `yoanngrange/fournyl`) helps bakers choose **where in France to open or take over a bakery**.
 It scores every French commune from open data and shows the result on a map.
 
 Read these before writing code:

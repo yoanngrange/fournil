@@ -1,8 +1,8 @@
-# Fournil — handoff package for Claude Code
+# Fournyl — handoff package for Claude Code
 
 ## How to use it
 
-1. Create an empty GitHub repository (e.g. `fournil`) and clone it.
+1. Create an empty GitHub repository (e.g. `fournyl`) and clone it.
 2. Copy everything from this folder into the repo root and commit.
 3. Open Claude Code in the repo. It reads `CLAUDE.md` automatically.
 4. Start with this prompt:
