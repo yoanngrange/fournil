@@ -6,6 +6,7 @@ const MAX_LABELS = 14;
 const LABEL_SPACING_PX = 90;
 export const COMMUNE_ZOOM = 7; // below: départements; from here: communes
 export const DEP_SCALE = ['#EEF1F7', '#C9D4EA', '#9BB0DA', '#5F80C4', '#1E3F8A']; // design/README.md
+const DEP_IDLE = '#E2DCCF'; // zoomed in: départements whose communes are not loaded (no score shown)
 
 /** Diagonal hatch (2 px lines every ~7 px, #4A3414 at 60 %), drawn at 2× for sharp screens. */
 function hatchImage() {
@@ -37,7 +38,7 @@ function bboxOf(geometry) {
   return [[w, s], [e, n]];
 }
 
-export function createMap({ container, communes, departements, france, loadGeo, locale, on }) {
+export function createMap({ container, communes, departements, france, loadGeo, loadAllVisible = () => false, locale, on }) {
   const depBounds = new Map(departements.features.map((f) => [f.properties.code, bboxOf(f.geometry)]));
   const loaded = new Map(); // dep -> features
   const loading = new Set();
@@ -58,7 +59,13 @@ export function createMap({ container, communes, departements, france, loadGeo, 
           type: 'fill',
           source: 'deps',
           paint: {
-            'fill-color': ['match', ['coalesce', ['feature-state', 'q'], -1], ...DEP_SCALE.flatMap((c, i) => [i, c]), '#EFEAE0'],
+            // Zoomed in, only the département in the middle of the view is scored commune by commune:
+            // the others are a plain shape with their border, not a département-level score.
+            'fill-color': [
+              'step', ['zoom'],
+              ['match', ['coalesce', ['feature-state', 'q'], -1], ...DEP_SCALE.flatMap((c, i) => [i, c]), '#EFEAE0'],
+              COMMUNE_ZOOM - 0.5, DEP_IDLE,
+            ],
             // Simplified département shapes do not follow the coast closely: hide them under the communes,
             // but only once that département's communes are drawn (otherwise the map goes blank while loading).
             'fill-opacity': [
@@ -105,7 +112,11 @@ export function createMap({ container, communes, departements, france, loadGeo, 
           type: 'line',
           source: 'deps',
           paint: {
-            'line-opacity': ['interpolate', ['linear'], ['zoom'], COMMUNE_ZOOM, 1, COMMUNE_ZOOM + 0.8, 0],
+            'line-opacity': [
+              'interpolate', ['linear'], ['zoom'],
+              COMMUNE_ZOOM, 1,
+              COMMUNE_ZOOM + 0.8, ['case', ['boolean', ['feature-state', 'loaded'], false], 0, 1],
+            ],
             'line-color': ['case', ['boolean', ['feature-state', 'hover'], false], '#1C1A17', '#A89E8E'],
             // `zoom` must be the input of the top-level interpolate, so the hover case goes inside.
             'line-width': [
@@ -172,10 +183,11 @@ export function createMap({ container, communes, departements, france, loadGeo, 
       map.getCanvas().style.cursor = f ? 'pointer' : '';
       on.hoverDep(f?.properties.code ?? null, e.point);
     } else {
-      setHover('deps', null);
       const f = map.queryRenderedFeatures(e.point, { layers: ['communes-fill'] })[0];
+      const d = f ? null : idleDepAt(e.point);
+      setHover('deps', d);
       setHover('communes', f?.properties.code ?? null);
-      map.getCanvas().style.cursor = f ? 'pointer' : '';
+      map.getCanvas().style.cursor = f || d ? 'pointer' : '';
       on.hoverCommune(f?.properties.code ?? null, e.point);
     }
   });
@@ -192,6 +204,10 @@ export function createMap({ container, communes, departements, france, loadGeo, 
     } else {
       const f = map.queryRenderedFeatures(e.point, { layers: ['communes-fill'] })[0];
       if (f) on.clickCommune(f.properties.code);
+      else {
+        const d = idleDepAt(e.point);
+        if (d) fitDep(d); // a neighbouring département: go there, which loads its communes
+      }
     }
   });
   map.on('moveend', () => {
@@ -222,13 +238,37 @@ export function createMap({ container, communes, departements, france, loadGeo, 
     notifyBusy();
   });
 
-  /** Load the commune polygons of every département intersecting the view (zoomed in only). */
+  /** Code of a département under `point` whose communes are not on the map. */
+  function idleDepAt(point) {
+    const d = map.queryRenderedFeatures(point, { layers: ['deps-fill'] })[0]?.properties.code;
+    return d && !loaded.has(d) ? d : null;
+  }
+
+  /** Départements whose bounding box intersects the view. */
+  function visibleDeps() {
+    const b = map.getBounds();
+    return [...depBounds]
+      .filter(([, [[w, s], [e, n]]]) => !(e < b.getWest() || w > b.getEast() || n < b.getSouth() || s > b.getNorth()))
+      .map(([dep]) => dep);
+  }
+
+  /** The département in the middle of the view (falls back to bounding boxes over the sea). */
+  function centreDeps() {
+    const c = map.getCenter();
+    const hit = map.queryRenderedFeatures(map.project(c), { layers: ['deps-fill'] })[0];
+    if (hit) return [hit.properties.code];
+    return [...depBounds].filter(([, [[w, s], [e, n]]]) => w <= c.lng && c.lng <= e && s <= c.lat && c.lat <= n).map(([d]) => d);
+  }
+
+  /**
+   * Zoomed in, load the commune polygons of the département in the middle of the view only: neighbours
+   * stay a plain shape until the user pans or clicks there (much less to download on a département page).
+   * Delivery mode needs every visible commune, so it loads all visible départements.
+   */
   function loadVisible() {
     if (map.getZoom() < COMMUNE_ZOOM - 0.5) return;
-    const b = map.getBounds();
-    for (const [dep, [[w, s], [e, n]]] of depBounds) {
+    for (const dep of loadAllVisible() ? visibleDeps() : centreDeps()) {
       if (loaded.has(dep) || loading.has(dep)) continue;
-      if (e < b.getWest() || w > b.getEast() || n < b.getSouth() || s > b.getNorth()) continue;
       loading.add(dep);
       notifyBusy();
       loadGeo(dep)
@@ -334,7 +374,9 @@ export function createMap({ container, communes, departements, france, loadGeo, 
       selected = code;
       if (code) map.setFeatureState({ source: 'communes', id: code }, { selected: true });
     },
+    /** On screen and drawn: zoomed in, communes of départements left as a plain shape do not count. */
     inView(c) {
+      if (!national() && !loaded.has(c.dep) && !loading.has(c.dep)) return false;
       return map.getBounds().contains([c.lon, c.lat]);
     },
     centre() {
@@ -345,6 +387,8 @@ export function createMap({ container, communes, departements, france, loadGeo, 
       map.easeTo({ center: [c.lon, c.lat], zoom: Math.max(map.getZoom(), 10.5) });
     },
     fitDep,
+    /** Load what the view needs now (e.g. after switching to delivery mode). */
+    loadVisible,
     zoomIn: () => map.zoomIn(),
     zoomOut: () => map.zoomOut(),
     reset: () => map.fitBounds(france, { padding: 24 }),

@@ -90,6 +90,7 @@ async function start() {
       exported.has(dep)
         ? Promise.all([getJSON(`geo/${dep}.geojson`), loadAdj(dep)]).then(([geo]) => geo)
         : Promise.reject(new Error(dep)),
+    loadAllVisible: () => dlv.on,
     locale: {
       'NavigationControl.ZoomIn': t['map.zoomIn'],
       'NavigationControl.ZoomOut': t['map.zoomOut'],
@@ -298,6 +299,7 @@ async function start() {
       if (dlv.on === on) return;
       dlv.on = on;
       syncDeliveryControls();
+      if (on) mapApi.loadVisible();
       if (on && dlv.base) setBase(dlv.base);
       else recompute();
     });

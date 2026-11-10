@@ -87,6 +87,9 @@ Coustard Regular (400; the Black 900 looked too much like Rockwell).
   *En boutique / En tournée* switch. Bottom sheet = ranking (+ delivery settings in round mode). No sliders.
   Selecting a commune shows a strip (name, score, "Voir la fiche complète") and the full details open on the
   commune's own page: a real URL that can be shared, bookmarked and reached with the back button.
+- Map zoomed in (a département page): only the département in the middle of the view is drawn commune by
+  commune; neighbouring départements are a plain shape with their border (no score) until the user pans or
+  clicks there. The on-screen count and ranking only use the drawn communes. Delivery mode draws all of them.
 - Content pages (commune, sources, legal, shortlist): the top band (mark + breadcrumb) stays at the top while
   scrolling. On a commune page, once the name/score block has scrolled away, a compact bar (name, postcode,
   score) slides in just below the band.
