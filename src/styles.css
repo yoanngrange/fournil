@@ -481,23 +481,22 @@ body.page { height: auto; background: var(--paper); overflow-x: clip; }
 .pg-muted.small { font-size: 12px; margin-top: 2px; }
 .pg-hero { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 28px; align-items: start; }
 /* Name + postcode + score: sticky; compact (one line) once stuck. */
-.pg-head-sentinel { height: 1px; }
-.pg-head { position: sticky; top: 0; z-index: 5; margin: 0 -24px; padding: 0 24px; background: var(--paper); }
-.pg-head.is-stuck {
-  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 16px;
-  padding: 8px 24px; background: var(--paper-2);
+.pg-head { margin: 0; }
+/* Compact copy of name + postcode + score, fixed at the top once the block has scrolled away. */
+.pg-fixbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 20; background: var(--paper-2); border-bottom: var(--line);
+  transform: translateY(-100%); visibility: hidden; transition: transform .18s ease, visibility 0s .18s;
 }
-/* Stuck: the band runs the full width of the window, like the header. */
-.pg-head.is-stuck::before {
-  content: ''; position: absolute; z-index: -1; top: 0; bottom: 0; left: 50%; width: 100vw; transform: translateX(-50%);
-  background: var(--paper-2); border-bottom: var(--line);
-}
-.pg-head.is-stuck .page-title { font-size: 28px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pg-head.is-stuck .pg-muted { margin: 2px 0 0; font-size: 12px; }
-.pg-head.is-stuck .pg-score { margin: 0; padding: 0; border: 0; }
-.pg-head.is-stuck .pg-score b { font-size: 28px; }
-.pg-head.is-stuck .pg-score .swatch { width: 18px; height: 18px; }
-.pg-head.is-stuck .pg-score-help { display: none; }
+.pg-fixbar.is-on { transform: none; visibility: visible; transition: transform .18s ease; }
+.pg-fixbar-inner { max-width: 1180px; margin: 0 auto; padding: 8px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.pg-fixbar-id { display: grid; min-width: 0; }
+.pg-fixbar-id b { font-family: var(--font-display); font-size: 26px; font-weight: 800; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.15; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pg-fixbar-id small { font-size: 12px; color: var(--ink-3); }
+.pg-fixbar-score { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.pg-fixbar-score .swatch { width: 18px; height: 18px; }
+.pg-fixbar-score b { font-family: var(--font-num); font-size: 26px; line-height: 1; }
+.pg-fixbar-score span:last-child { color: var(--ink-2); font-size: 14px; }
+@media (prefers-reduced-motion: reduce) { .pg-fixbar, .pg-fixbar.is-on { transition: none; } }
 .pg-score { display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 10px 0; border-top: var(--line); border-bottom: var(--line); }
 .pg-score .swatch { width: 24px; height: 24px; }
 .pg-score b { font-family: var(--font-num); font-size: 46px; line-height: 1; }
@@ -617,11 +616,9 @@ body.page { height: auto; background: var(--paper); overflow-x: clip; }
 }
 @media (max-width: 520px) {
   .page-main { padding: 20px 16px 40px; }
-  .pg-head { margin: 0 -16px; padding: 0 16px; }
-  .pg-head.is-stuck { padding: 8px 16px; }
-  .pg-head.is-stuck .page-title { font-size: 22px; }
-  .pg-head.is-stuck .pg-score b { font-size: 22px; }
-  .pg-head.is-stuck .pg-score span:last-child { font-size: 12px; }
+  .pg-fixbar-inner { padding: 8px 16px; }
+  .pg-fixbar-id b, .pg-fixbar-score b { font-size: 22px; }
+  .pg-fixbar-score span:last-child { font-size: 12px; }
   .page-top { padding: 10px max(16px, calc((100% - 1180px) / 2 + 16px)); gap: 6px 14px; }
   .page-title { font-size: 42px; }
   .pg-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
