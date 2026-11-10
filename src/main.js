@@ -551,7 +551,7 @@ async function start() {
   syncDeliveryControls();
   await mapApi.whenReady;
   // Département page (/loire-atlantique/): open on it unless the address already holds a map position.
-  const preset = document.querySelector('meta[name="fournil-dep"]')?.content;
+  const preset = document.querySelector('meta[name="fournyl-dep"]')?.content;
   if (preset && !sharedPosition) mapApi.fitDep(preset);
   if (dlv.on && dlv.base) setBase(dlv.base); // also loads the neighbour lists a contiguous block needs
   else recompute();

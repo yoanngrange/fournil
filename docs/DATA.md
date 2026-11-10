@@ -1,4 +1,4 @@
-# Fournil — data guide
+# Fournyl — data guide
 
 All sources below are French public open data. Most are under the **Licence Ouverte / Open Licence 2.0**
 (Etalab), which requires attribution (source + date) — the UI footer and `meta.json` handle that.

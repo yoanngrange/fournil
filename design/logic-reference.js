@@ -1,4 +1,4 @@
-// Fournil — reference logic extracted from the mockups (design/Zoom.dc.html).
+// Fournyl — reference logic extracted from the mockups (design/Zoom.dc.html).
 // Plain functions, no dependencies. Port them into src/; keep behaviour identical.
 
 /** Criteria shown in the sidebar. `dir: -1` means lower is better. */

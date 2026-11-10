@@ -16,5 +16,5 @@ export const depPath = (depName) => `${slugify(depName)}/`;
 
 export const communePath = (depName, name, code) => `${slugify(depName)}/${slugify(name)}-${code.toLowerCase()}/`;
 
-/** Site root (e.g. "/fournil/"), whatever page we are on: every page sets <base href> to it. */
+/** Site root ("/" on fournyl.com, "/fournyl/" on github.io), whatever page we are on: every page sets <base href> to it. */
 export const siteRoot = () => new URL('./', document.baseURI).pathname;

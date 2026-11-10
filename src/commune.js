@@ -6,7 +6,7 @@ import { fmtCriterion, fmtEuro, fmtInt, fmtPct, fmtSigned, tr } from './lib/form
 import { readShortlist, toggleShortlist } from './lib/shortlist.js';
 import { depPath } from './lib/slug.js';
 
-const code = document.querySelector('meta[name="fournil-commune"]').content;
+const code = document.querySelector('meta[name="fournyl-commune"]').content;
 const main = document.getElementById('page');
 const getJSON = (path) => fetch(`data/${path}`).then((r) => (r.ok ? r.json() : Promise.reject(new Error(path))));
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
