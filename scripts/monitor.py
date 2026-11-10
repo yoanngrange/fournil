@@ -15,7 +15,7 @@ import urllib.error
 import urllib.request
 from datetime import datetime, timezone
 
-SITE_URL = os.environ.get("SITE_URL", "https://yoanngrange.github.io/fournil/").rstrip("/") + "/"
+SITE_URL = os.environ.get("SITE_URL", "https://fournyl.com/").rstrip("/") + "/"
 STALE_DAYS = int(os.environ.get("STALE_DAYS", "40"))
 UA = "fournyl-monitor/1.0"
 

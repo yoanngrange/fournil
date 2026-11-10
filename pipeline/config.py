@@ -11,7 +11,7 @@ RAW = ROOT / "pipeline" / "raw"
 OUT = ROOT / "public" / "data"
 
 # Public address of the site (canonical URLs, sitemap, 404 base). CI may override it.
-SITE_URL = os.environ.get("SITE_URL", "https://yoanngrange.github.io/fournil/")
+SITE_URL = os.environ.get("SITE_URL", "https://fournyl.com/")
 
 # Cloudflare Web Analytics (cookieless). Empty: no analytics script on the pages (local builds, forks).
 ANALYTICS_TOKEN = os.environ.get("CF_BEACON_TOKEN", "")
