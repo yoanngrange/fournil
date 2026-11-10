@@ -22,7 +22,7 @@ UA = "fournyl-monitor/1.0"
 # path -> text that must appear in the response
 PAGES = {
     "": "communes-index.json",
-    "loire-atlantique/": 'name="fournil-dep" content="44"',
+    "loire-atlantique/": 'name="fournyl-dep" content="44"',
     "loire-atlantique/clisson-44043/": 'content="44043"',
     "infos-legales/": "src/legal.js",
     "sources/": "src/sources.js",
