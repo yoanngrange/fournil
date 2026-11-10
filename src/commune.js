@@ -88,12 +88,24 @@ function whyInfo() {
   return `<div class="info-pop" id="why-info" hidden><ul>${items}</ul><a href="sources/#how-title">${t['page.why.method']} →</a></div>`;
 }
 
-/** The name, postcode and score stay on screen while scrolling; once stuck they shrink to one line. */
+/**
+ * Once the name/score block has scrolled out of view, a compact copy slides in at the top of the window.
+ * It is a separate fixed bar, so showing it never changes the page height (a sticky block that shrank
+ * when stuck made the page jump back and forth at the threshold). Visual only: the block itself stays
+ * in the page for screen readers.
+ */
 function stickyHead(root) {
   const head = root.querySelector('#pg-head');
-  const sentinel = root.querySelector('.pg-head-sentinel');
-  if (!head || !sentinel || !('IntersectionObserver' in window)) return;
-  new IntersectionObserver(([e]) => head.classList.toggle('is-stuck', !e.isIntersecting)).observe(sentinel);
+  if (!head || !('IntersectionObserver' in window)) return;
+  const bar = document.createElement('div');
+  bar.className = 'pg-fixbar';
+  bar.setAttribute('aria-hidden', 'true');
+  bar.innerHTML = `<div class="pg-fixbar-inner">
+      <div class="pg-fixbar-id"><b>${head.querySelector('.page-title').innerHTML}</b><small>${head.querySelector('.pg-muted').innerHTML}</small></div>
+      <div class="pg-fixbar-score">${head.querySelector('.pg-score').innerHTML}</div>
+    </div>`;
+  document.body.append(bar);
+  new IntersectionObserver(([e]) => bar.classList.toggle('is-on', !e.isIntersecting && e.boundingClientRect.top < 0)).observe(head);
 }
 
 function wireInfo(root) {
@@ -511,7 +523,6 @@ async function start() {
 
   main.innerHTML = `
     <figure class="pg-photo" id="photo" hidden></figure>
-    <div class="pg-head-sentinel" aria-hidden="true"></div>
     <div class="pg-head" id="pg-head">
       <div class="pg-head-id">
         <h1 class="page-title">${esc(p.name)}</h1>
