@@ -470,6 +470,7 @@ body.page { height: auto; background: var(--paper); overflow-x: clip; }
   display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
   padding: 12px max(24px, calc((100% - 1180px) / 2 + 24px));
   background: var(--paper-2); border-bottom: var(--line);
+  position: sticky; top: 0; z-index: 21; /* constant height, so sticking never moves the page */
 }
 .page-brand { display: flex; align-items: center; gap: 8px; font-family: var(--font-brand); font-size: 25px; font-weight: 400; letter-spacing: 0; color: var(--ink); text-decoration: none; }
 .page-brand img { width: 32px; height: 32px; }
@@ -480,11 +481,10 @@ body.page { height: auto; background: var(--paper); overflow-x: clip; }
 .pg-muted { color: var(--ink-3); margin: 6px 0 0; }
 .pg-muted.small { font-size: 12px; margin-top: 2px; }
 .pg-hero { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 28px; align-items: start; }
-/* Name + postcode + score: sticky; compact (one line) once stuck. */
 .pg-head { margin: 0; }
-/* Compact copy of name + postcode + score, fixed at the top once the block has scrolled away. */
+/* Compact copy of name + postcode + score, fixed under the sticky top band once the block has scrolled away. */
 .pg-fixbar {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 20; background: var(--paper-2); border-bottom: var(--line);
+  position: fixed; top: var(--top-h, 0px); left: 0; right: 0; z-index: 20; background: var(--paper-2); border-bottom: var(--line);
   transform: translateY(-100%); visibility: hidden; transition: transform .18s ease, visibility 0s .18s;
 }
 .pg-fixbar.is-on { transform: none; visibility: visible; transition: transform .18s ease; }

@@ -89,14 +89,15 @@ function whyInfo() {
 }
 
 /**
- * Once the name/score block has scrolled out of view, a compact copy slides in at the top of the window.
+ * The top band (logo + breadcrumb) is sticky. Once the name/score block has scrolled under it,
+ * a compact copy slides in just below the band.
  * It is a separate fixed bar, so showing it never changes the page height (a sticky block that shrank
  * when stuck made the page jump back and forth at the threshold). Visual only: the block itself stays
  * in the page for screen readers.
  */
 function stickyHead(root) {
   const head = root.querySelector('#pg-head');
-  if (!head || !('IntersectionObserver' in window)) return;
+  if (!head) return;
   const bar = document.createElement('div');
   bar.className = 'pg-fixbar';
   bar.setAttribute('aria-hidden', 'true');
@@ -105,7 +106,20 @@ function stickyHead(root) {
       <div class="pg-fixbar-score">${head.querySelector('.pg-score').innerHTML}</div>
     </div>`;
   document.body.append(bar);
-  new IntersectionObserver(([e]) => bar.classList.toggle('is-on', !e.isIntersecting && e.boundingClientRect.top < 0)).observe(head);
+  const top = document.querySelector('.page-top');
+  let topH = 0, queued = false;
+  const update = () => {
+    queued = false;
+    bar.classList.toggle('is-on', head.getBoundingClientRect().bottom <= topH);
+  };
+  const measure = () => {
+    topH = top ? top.offsetHeight : 0;
+    document.documentElement.style.setProperty('--top-h', `${topH}px`);
+    update();
+  };
+  if (top && 'ResizeObserver' in window) new ResizeObserver(measure).observe(top);
+  measure();
+  addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(update); } }, { passive: true });
 }
 
 function wireInfo(root) {
