@@ -7,7 +7,7 @@ import subprocess
 import pytest
 
 from pipeline.config import OUT, ROOT, SITE_URL
-from pipeline.pages import Site, analytics_tag, commune_path, slugify
+from pipeline.pages import Site, analytics_tag, at_place, commune_path, slugify
 
 CASES = {
     "L'Abergement-Clémenciat": "l-abergement-clemenciat",
@@ -47,7 +47,7 @@ def test_every_commune_has_a_unique_path(site):
 
 def test_routes(site):
     clisson = site.route("loire-atlantique/clisson-44043/")
-    assert clisson and "<title>Clisson (44)" in clisson and 'content="44043"' in clisson
+    assert clisson and "<title>Créer une boulangerie à Clisson (44190)" in clisson and 'content="44043"' in clisson
     assert f'rel="canonical" href="{SITE_URL}loire-atlantique/clisson-44043/"' in clisson
     assert site.route("loire-atlantique/") is not None
     assert site.route("loire-atlantique/clison-44043/") is None  # misspelt: 404 page redirects
@@ -79,3 +79,32 @@ def test_static_pages_get_analytics_marker_replaced(site, tmp_path, monkeypatch)
         text = (tmp_path / rel).read_text()
         assert "<!-- analytics -->" not in text and '"token": "tok"' in text
     assert "infos-legales/" in (tmp_path / "sitemap.xml").read_text()
+
+
+def test_at_place():
+    assert at_place("Clisson") == "à Clisson"
+    assert at_place("Le Pellerin") == "au Pellerin"
+    assert at_place("Les Sorinières") == "aux Sorinières"
+    assert at_place("La Baule-Escoublac") == "à La Baule-Escoublac"
+
+
+def test_seo_tags(site, tmp_path):
+    page = site.commune_page("44043")
+    assert 'property="og:image" content="' + SITE_URL + 'img/og.png"' in page
+    assert '"@type":"BreadcrumbList"' in page and "note 62/100" in page
+    dep = site.dep_page("44")
+    assert dep.count("<title>") == 1 and "Loire-Atlantique (44)" in dep
+    assert 'href="loire-atlantique/clisson-44043/"' in dep and "<!-- places -->" not in dep
+    assert dep.count('property="og:title"') == 1  # the shell's generic tags are replaced, not duplicated
+    for rel in ("index.html", "sources/index.html", "infos-legales/index.html", "ma-selection/index.html"):
+        (tmp_path / rel).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(ROOT / "public" / rel, tmp_path / rel)
+    site.write(tmp_path)
+    home = (tmp_path / "index.html").read_text()
+    assert f'<link rel="canonical" href="{SITE_URL}">' in home and 'href="loire-atlantique/"' in home
+    assert '"@type":"Organization"' in home
+    llms = (tmp_path / "llms.txt").read_text()
+    assert llms.startswith("# Fournyl\n") and f"({SITE_URL}loire-atlantique/)" in llms
+    sitemap = (tmp_path / "sitemap.xml").read_text()
+    assert sitemap.count("<url>") == 3 + len(site.exported) + len(site.communes) and "<lastmod>" in sitemap
+    assert "noindex" in (tmp_path / "ma-selection/index.html").read_text()

@@ -290,6 +290,7 @@ export default {
   'page.bread.noName': 'Nom non communiqué',
   'page.bread.none': 'Aucun point de vente de pain à moins de 5 km.',
   'page.bread.attribution': '© IGN – Plan IGN',
+  'page.bread.note': 'La carte ne montre que les établissements Sirene géolocalisés et dont la diffusion est publique. Le nombre de boulangeries de la commune, plus haut, vient de la BPE de l’Insee, qui compte chaque boutique : les deux chiffres peuvent donc différer.',
   'page.sources': 'Sources : Insee (populations légales et recensement {census}, Filosofi {income}, BPE {bpe}), Sirene ({sirene}), BODACC, ministère de l’Intérieur (SSMSI {crime}, municipales {election}, Répertoire national des élus), IGN Admin Express, La Poste (codes postaux). ',
   'page.disclaimer': 'Fiche calculée le {built} à partir de données publiques, dont certaines ont plusieurs années de retard. Elle aide à préparer une visite, sans la remplacer : vérifiez sur place la concurrence, les loyers et le passage, et faites valider votre projet par un conseiller (chambre de métiers, banque, expert-comptable). <a href="infos-legales/#conditions">Conditions d’utilisation</a> · <a href="infos-legales/#donnees">Mises à jour des données</a>',
   'footer.text': 'Fournyl est un outil indépendant d’aide à la décision, fondé sur des données publiques. Il ne garantit ni l’exactitude ni l’actualité des chiffres.',
@@ -310,11 +311,18 @@ export default {
   'sector.other': 'Autres',
 
   // Generated pages (pipeline/pages.py reads these single-line entries; keep each on one line).
-  'seo.home.title': 'Fournyl — où ouvrir ou reprendre une boulangerie en France',
-  'seo.dep.title': 'Ouvrir ou reprendre une boulangerie en {dep} ({code}) — Fournyl',
-  'seo.dep.description': 'Les {n} communes de {dep} notées pour ouvrir ou reprendre une boulangerie : habitants par boulangerie, revenus, démographie et concurrence.',
-  'seo.commune.title': '{name} ({code}) : ouvrir ou reprendre une boulangerie — Fournyl',
-  'seo.commune.description': '{name} ({dep}) : {pop} habitants, {bakeries}, revenu médian {income}. Concurrence, reprises, prix des fonds, démographie et économie locale.',
+  'seo.home.title': 'Étude de marché boulangerie – Créer ou reprendre une boulangerie en France | Fournyl',
+  'seo.home.description': 'Étude de marché gratuite pour créer ou reprendre une boulangerie : les {n} communes de France notées sur 100 (habitants par boulangerie, revenus, démographie, concurrence), à partir des données publiques.',
+  'seo.dep.title': 'Étude de marché – Création ou reprise de boulangerie – {dep} ({code}) | Fournyl',
+  'seo.dep.description': 'Créer ou reprendre une boulangerie en {dep} ({code}) : les {n} communes notées sur 100 (habitants par boulangerie, revenus, démographie, concurrence). Étude de marché gratuite à partir des données publiques.',
+  'seo.commune.title': 'Créer une boulangerie {at} ({cp}) – Reprendre une boulangerie – Étude de marché',
+  'seo.commune.description': 'Créer ou reprendre une boulangerie {at} ({dep}) : {pop} habitants, {bakeries}, revenu médian {income}, note {score}. Concurrence, reprises, prix des fonds, démographie et économie locale.',
+  'seo.score.none': 'non calculée',
+  'seo.sources.title': 'Sources et méthode – Étude de marché boulangerie | Fournyl',
+  'seo.legal.title': 'Infos légales | Fournyl',
+  'seo.places.deps': 'Tous les départements',
+  'seo.places.communes': 'Toutes les communes – {dep}',
+  'seo.og.alt': 'Fournyl – où créer ou reprendre une boulangerie en France',
   'seo.bakeries.none': 'aucune boulangerie',
   'seo.bakeries.one': '1 boulangerie',
   'seo.bakeries.many': '{n} boulangeries',
@@ -405,13 +413,13 @@ export default {
   'doc.legal': {
     id: 'mentions',
     title: 'Mentions légales',
-    updated: '2026-11-06',
+    updated: '2026-11-11',
     intro: 'Informations prévues par la loi pour la confiance dans l’économie numérique (LCEN, article 6).',
     sections: [
       {
         title: 'Éditeur',
         paras: [
-          'Le site <b>fournyl.com</b> est édité par l’association <b>Vraie Forêt</b>, association loi 1901 basée en Loire-Atlantique, RNA W442030253 (<a href="https://vraieforet.com">vraieforet.com</a>). Le site est gratuit et sans publicité.',
+          'Le site <b>fournyl.com</b> est édité par l’association <b>Vraie Forêt</b>, association loi 1901 dont le siège est au 4 allée Beau Rivage, 44200 Nantes, RNA W442030253 (<a href="https://vraieforet.com">vraieforet.com</a>). Le site est gratuit et sans publicité.',
           'Directeur de la publication : Yoann Grange.',
           'Contact : <a href="mailto:{contact}">{contact}</a>.',
         ],

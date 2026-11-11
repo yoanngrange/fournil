@@ -630,3 +630,11 @@ body.page { height: auto; background: var(--paper); overflow-x: clip; }
   .doc h1 { font-size: 38px; }
   .site-footer-inner { padding: 16px 16px 24px; }
 }
+
+/* Map sidebar: every département / commune as a plain link (keyboard access, crawlable). */
+.site-places { margin-top: 14px; font-size: 13px; }
+.site-places summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
+.site-places summary:hover { text-decoration: underline; }
+.site-places ul { margin: 6px 0 0; padding: 0; list-style: none; columns: 2; column-gap: 16px; }
+.site-places li { break-inside: avoid; padding: 2px 0; }
+.pg-bread-note { margin-top: 12px; }
