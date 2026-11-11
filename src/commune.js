@@ -588,7 +588,8 @@ async function start() {
       ${section('bread', t['page.bread'], tr('page.bread.src', { sirene: sireneMonth }),
         `<div class="pg-bread"><div class="pg-bread-map" id="bread-map" role="img" aria-label="${esc(t['page.bread'])}"></div>
           <div><div class="pg-legend">${Object.entries(KIND_COLOURS).map(([k, c]) => `<span><i style="background:${c}"></i>${t[`page.bread.${k}`]}</span>`).join('')}
-            <span><i class="is-pin"></i>${t['page.bread.townHall']}</span></div>${breadList(p)}</div></div>`, true)}
+            <span><i class="is-pin"></i>${t['page.bread.townHall']}</span></div>${breadList(p)}
+          <p class="pg-muted small pg-bread-note">${t['page.bread.note']}</p></div></div>`, true)}
     </div>
     <p class="pg-sources">${tr('page.sources', { census: y.census, income: y.income, bpe: y.bpe, sirene: sireneMonth, crime: y.crime, election: y.election })}<a href="sources/">${t['sources.link']}</a></p>
     <div class="callout pg-disclaimer"><p>${tr('page.disclaimer', { built: new Date(meta.built_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) })}</p></div>`;

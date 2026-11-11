@@ -56,3 +56,20 @@ is a script, no proxy needed. Cookieless, so no consent banner (see Infos légal
   assertion; never deploy around it.
 - **Monitor email, pages 404:** check the last `deploy.yml` run and Settings > Pages.
 - **Monitor email, data stale:** both monthly runs failed; run `deploy.yml` by hand after fixing.
+
+## Search engines (SEO)
+
+Built by `pipeline/pages.py` on every deploy:
+- Titles and descriptions per page type (strings `seo.*` in `src/i18n/fr.js`): home, département
+  ("Étude de marché – Création ou reprise de boulangerie – {dep} ({code})"), commune ("Créer une boulangerie
+  à {name} ({postcode}) – Reprendre une boulangerie – Étude de marché", with the default score in the description).
+- Canonical URLs, Open Graph / Twitter tags with `img/og.png` (1200 × 630), JSON-LD (WebSite + Organization on
+  the home page, BreadcrumbList on département and commune pages).
+- Crawlable links: the map sidebar lists every département (home) or every commune (département page).
+- `sitemap.xml` (every page, `lastmod` = data build date), `robots.txt`, `llms.txt` (summary for AI assistants).
+  "Ma sélection" is `noindex`.
+
+One-time, by Yoann (needs his Google / Microsoft accounts):
+1. Google Search Console > Add property > Domain `fournyl.com`: add the `google-site-verification` TXT record
+   at OVH, then Sitemaps > submit `https://fournyl.com/sitemap.xml`.
+2. Bing Webmaster Tools > Import from Google Search Console (also feeds DuckDuckGo, Ecosia, Qwant).
