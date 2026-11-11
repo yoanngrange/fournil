@@ -420,16 +420,22 @@ const IGN_PLAN =
   '&STYLE=normal&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png';
 const KIND_COLOURS = { bakery: '#FF0000', pastry: '#E08A5A', bake_off: '#1E3F8A', retail: '#8A8172' };
 
+function breadRow(b) {
+  const since = b.year ? ` · ${tr('page.bread.since', { year: b.year })}` : '';
+  return `<li><span class="pg-dot" style="background:${KIND_COLOURS[b.kind]}"></span>
+    <span>${b.name ? esc(b.name) : `<i>${t['page.bread.noName']}</i>`} <small>${t[`page.bread.${b.kind}`]}${since}</small></span>
+    <b>${b.km.toFixed(1).replace('.', ',')} km</b></li>`;
+}
+
+/** Points of sale in the commune first, then the others within 5 km; nearest first in each group. */
 function breadList(p) {
   if (!p.bread_points.length) return `<p class="pg-muted">${t['page.bread.none']}</p>`;
-  const rows = p.bread_points
-    .map(
-      (b) => `<li><span class="pg-dot" style="background:${KIND_COLOURS[b.kind]}"></span>
-        <span>${b.name ? esc(b.name) : `<i>${t['page.bread.noName']}</i>`} <small>${t[`page.bread.${b.kind}`]}</small></span>
-        <b>${b.km.toFixed(1).replace('.', ',')} km</b></li>`,
-    )
-    .join('');
-  return `<ul class="pg-points">${rows}</ul>`;
+  const here = p.bread_points.filter((b) => b.here);
+  const around = p.bread_points.filter((b) => !b.here);
+  const group = (title, list, empty) => `<h3 class="pg-points-title">${title} <span>${fmtInt(list.length)}</span></h3>
+    ${list.length ? `<ul class="pg-points">${list.map(breadRow).join('')}</ul>` : `<p class="pg-muted small">${empty}</p>`}`;
+  return `<div class="pg-points-wrap">${group(t['page.bread.here'], here, t['page.bread.hereNone'])}${
+    around.length ? group(t['page.bread.around'], around, '') : ''}</div>`;
 }
 
 const BREAD_RADIUS_KM = 5; // same radius as the pipeline (build_local.BREAD_RADIUS_M)
@@ -482,7 +488,7 @@ function breadMap(el, p) {
     el.style.background = KIND_COLOURS[b.kind];
     el.setAttribute('aria-label', `${b.name || t['page.bread.noName']}, ${t[`page.bread.${b.kind}`]}`);
     const popup = new maplibregl.Popup({ offset: 12, closeButton: false }).setHTML(
-      `<b>${b.name ? esc(b.name) : t['page.bread.noName']}</b><br>${t[`page.bread.${b.kind}`]} · ${b.km.toFixed(1).replace('.', ',')} km`,
+      `<b>${b.name ? esc(b.name) : t['page.bread.noName']}</b><br>${t[`page.bread.${b.kind}`]}${b.year ? ` · ${tr('page.bread.since', { year: b.year })}` : ''} · ${b.km.toFixed(1).replace('.', ',')} km`,
     );
     new maplibregl.Marker({ element: el }).setLngLat([b.lon, b.lat]).setPopup(popup).addTo(map);
   }

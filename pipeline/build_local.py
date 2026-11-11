@@ -172,11 +172,13 @@ def bread_points(centres: pd.DataFrame) -> dict:
             "denominationUsuelleEtablissement",
             "coordonneeLambertAbscisseEtablissement",
             "coordonneeLambertOrdonneeEtablissement",
+            "dateCreationEtablissement",
+            "codeCommuneEtablissement",
         ],
         filters=(pc.field("etatAdministratifEtablissement") == "A")
         & pc.field("activitePrincipaleEtablissement").isin(list(BREAD_KINDS)),
     ).to_pandas()
-    t.columns = ["siren", "naf", "public", "sign", "usual_name", "x", "y"]
+    t.columns = ["siren", "naf", "public", "sign", "usual_name", "x", "y", "created", "commune"]
     t["x"] = pd.to_numeric(t.x, errors="coerce")
     t["y"] = pd.to_numeric(t.y, errors="coerce")
     t = t[(t.public == "O") & t.x.notna() & t.y.notna()]
@@ -191,8 +193,13 @@ def bread_points(centres: pd.DataFrame) -> dict:
     company = t.company.where((t.legal_form != SOLE_TRADER) & (t.ul_public == "O"))
     t["name"] = t.usual_name.fillna(t.sign).fillna(company)
     t["kind"] = t.naf.map(BREAD_KINDS)
+    # Year the current establishment was registered: a takeover usually creates a new one, so this is
+    # rather "since when the current operator runs it" than the age of the shop.
+    t["year"] = pd.to_datetime(t.created, errors="coerce").dt.year  # parquet stores a date
+    mapping = cog.code_mapping()  # arrondissements and merged communes -> current commune
+    t["home"] = t.commune.map(lambda c: mapping.get(c, c) if isinstance(c, str) else None)
 
-    pts = gpd.GeoDataFrame(t[["name", "kind"]], geometry=gpd.points_from_xy(t.x, t.y), crs=2154)
+    pts = gpd.GeoDataFrame(t[["name", "kind", "year", "home"]], geometry=gpd.points_from_xy(t.x, t.y), crs=2154)
     ll = pts.to_crs(4326)
     pts["lat"] = ll.geometry.y.round(5)
     pts["lon"] = ll.geometry.x.round(5)
@@ -212,6 +219,8 @@ def bread_points(centres: pd.DataFrame) -> dict:
                 "km": round(r.dist / 1000, 1),
                 "kind": r.kind,
                 "name": r.name if isinstance(r.name, str) else None,
+                "year": int(r.year) if pd.notna(r.year) else None,
+                "here": r.home == code,
             }
             for r in g.head(BREAD_MAX_POINTS).itertuples()
         ]

@@ -187,8 +187,13 @@ def test_bread_points(index):
         assert len(pts) <= 300
         assert [p["km"] for p in pts] == sorted(p["km"] for p in pts)
         for p in pts:
-            assert set(p) == {"lat", "lon", "km", "kind", "name"}
+            assert set(p) == {"lat", "lon", "km", "kind", "name", "year", "here"}
             assert p["kind"] in {"bakery", "pastry", "bake_off", "retail"} and p["km"] <= 5.0
+            assert p["year"] is None or 1900 <= p["year"] <= 2100
+            assert isinstance(p["here"], bool)
+    clisson = load("commune/44043.json")["bread_points"]
+    assert any(p["here"] for p in clisson) and any(not p["here"] for p in clisson)
+    assert sum(p["year"] is not None for p in clisson) >= 0.9 * len(clisson)
 
 
 def test_postcodes(index):
