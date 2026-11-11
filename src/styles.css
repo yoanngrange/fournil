@@ -590,7 +590,11 @@ body.page { height: auto; background: var(--paper); overflow-x: clip; }
 .pg-legend span { display: inline-flex; align-items: center; gap: 6px; }
 .pg-legend i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
 .pg-legend i.is-pin { background: var(--ink); border: 2px solid var(--paper-2); box-shadow: 0 0 0 1px var(--ink); }
-.pg-points { list-style: none; margin: 0; padding: 0; max-height: 360px; overflow-y: auto; }
+.pg-points-wrap { max-height: 420px; overflow-y: auto; }
+.pg-points { list-style: none; margin: 0 0 8px; padding: 0; }
+.pg-points-title { position: sticky; top: 0; z-index: 1; background: var(--paper-2); margin: 12px 0 0; padding: 6px 0; border-bottom: var(--line); font-size: 13px; font-weight: 700; display: flex; justify-content: space-between; }
+.pg-points-wrap > .pg-points-title:first-child { margin-top: 0; }
+.pg-points-title span { font-family: var(--font-num); }
 .pg-points li { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 7px 0; border-bottom: var(--line-soft); font-size: 13px; }
 .pg-points small { color: var(--ink-3); }
 .pg-points b { font-family: var(--font-num); white-space: nowrap; }
